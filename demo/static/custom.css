@@ -1,0 +1,18 @@
+/* temp */
+
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:300);
+
+.display-title {
+    color: #00325f;
+    font-weight: bold;
+    font-size: 40px;
+    text-align: center;
+    margin: 1em 0em 0em 0em;
+}
+
+.display-subtitle {
+    color: #0091b5;
+    font-weight: bold;
+    font-size: 30px;
+    text-align: center;
+}
