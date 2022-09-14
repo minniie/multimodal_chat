@@ -2,7 +2,7 @@
 Princeton senior thesis
 
 
-### Install Requirements
+### Install requirements
 ```
 pip install -r requirements.txt
 ```
