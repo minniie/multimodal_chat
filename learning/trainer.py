@@ -20,7 +20,7 @@ class ResponseGeneratorTrainer():
             model=response_generator.model,
             tokenizer=response_generator.tokenizer,
             train_dataset=dataset["train_set"],
-            eval_dataset=dataset["dev_set"][:10],
+            eval_dataset=dataset["dev_set"],
             data_collator=collator,
             preprocess_logits_for_metrics=self.preprocess_logits_for_metrics,
             compute_metrics=self.compute_metrics
@@ -71,8 +71,8 @@ class ResponseGeneratorTrainer():
         for pred, label in zip(preds, labels):
             preds_text.append(self.normalize_decode_per_token(pred))
             labels_text.append(self.normalize_decode_per_token(label))
-        print(preds_text)
-        print(labels_text)
+        # print(preds_text)
+        # print(labels_text)
         bleu = corpus_bleu(labels_text, preds_text, weights=(1,0,0,0))
         
         # preds_text = self.tokenizer.batch_decode(preds, skip_special_tokens=True)

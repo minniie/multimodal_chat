@@ -17,8 +17,8 @@ class ResponseGeneratorCollator():
         self.tokenizer = tokenizer
 
     def __call__(self, samples):
-        contexts = [self.tokenizer.eos_token.join(s[:-1])+self.tokenizer.eos_token for s in samples]
-        responses = [s[-1]+self.tokenizer.eos_token for s in samples]
+        contexts = [self.tokenizer.eos_token.join(s[:-1]) + self.tokenizer.eos_token for s in samples]
+        responses = [s[-1] + self.tokenizer.eos_token for s in samples]
         # print("==============")
         # print(contexts)
         # print("==============")
@@ -36,7 +36,7 @@ class ResponseGeneratorCollator():
             ))
         input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id)
         attention_mask = input_ids != self.tokenizer.pad_token_id
-        labels = pad_sequence(labels, batch_first=True, padding_value=-100)
+        labels = pad_sequence(labels, batch_first=True, padding_value=self.tokenizer.pad_token_id)
         # print(input_ids)
         # print(attention_mask)
         # print(labels)

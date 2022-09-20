@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Thesis</title>
+    <script src="//code.jquery.com/jquery-3.4.0.min.js"></script>
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="static/custom.css" type="text/css">
+</head>
+
+<body>
+<div class="container">
+    <h1 class="display-title">Send-me-the-pic</h1>
+    <div class="row">
+        <div class="col">
+            <hr>
+	        <br>
+	    </div>
+    </div>
+    
+    <form>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="header">Dialogue context</label>
+                    <textarea class="form-control" id="context" placeholder="Current dialogue context" rows="12"></textarea>	
+                </div>
+                <div class="form-group">
+                    <label for="header">User message</label>
+                    <button type="submit" id="send_btn" class="btn btn-primary btn-sm float-right mb-2">Send</button>
+                    <textarea class="form-control" id="message" placeholder="Type message and press enter or click send" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+
+</html>
+<script src="/static/script.js"></script>
