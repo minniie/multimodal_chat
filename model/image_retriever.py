@@ -18,6 +18,8 @@ class ImageRetriever():
         ):
         self.text_model_name = text_model_name
         self.image_model_name = image_model_name
+        self.load_processor()
+        self.load_model()
 
     def load_processor(
             self
