@@ -40,9 +40,11 @@ class ResponseGenerator():
         if not pred_text:
             pred_text = "nothing was generated." 
         
-        print("==============")
+        print("======= input text =======")
         print(inp_text)
-        print("==============")
+        print("======= pred text =======")
         print(pred_text)
+        print("======= pred text original =======")
+        print(self.tokenizer.decode(pred[0]))
 
         return pred_text

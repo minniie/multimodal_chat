@@ -16,8 +16,8 @@ from util.text import (
 )
 
 
-USER_PREFIX = "USER: "
-MODEL_PREFIX = "AI: "
+USER_PREFIX = "User: "
+MODEL_PREFIX = "Bot: "
 
 
 app = Flask(__name__)
