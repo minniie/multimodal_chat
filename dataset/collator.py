@@ -36,7 +36,7 @@ class ResponseGeneratorCollator():
             ))
         input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id)
         attention_mask = input_ids != self.tokenizer.pad_token_id
-        labels = pad_sequence(labels, batch_first=True, padding_value=self.tokenizer.pad_token_id)
+        labels = pad_sequence(labels, batch_first=True, padding_value=-100)
         # print(input_ids)
         # print(attention_mask)
         # print(labels)

@@ -1,7 +1,5 @@
-import os
 import glob
 import json
-import requests
 
 from PIL import Image
 
@@ -32,17 +30,29 @@ class PhotochatPreprocessor():
                         curr_set = "dev_set"
                     elif "test" in file_path:
                         curr_set = "test_set"
-                    # TODO: image retriever format
+                    # TODO: dataset for image retriever
                     # images = [Image.open(requests.get(url, stream=True).raw) for url in urls]
                     self.data_for_image_retriever[curr_set].append(
                         [uttr["message"] for uttr in datum["dialogue"]]
                     )
-                    self.data_for_response_generator[curr_set].append(
-                        [uttr["message"] for uttr in datum["dialogue"]]
-                    )
-        print(f"{'*'*5} train set: {len(self.data_for_image_retriever['train_set'])}")
-        print(f"{'*'*5} dev set: {len(self.data_for_image_retriever['dev_set'])}")
-        print(f"{'*'*5} test set: {len(self.data_for_image_retriever['test_set'])}")
+
+                    # dataset for response generator
+                    curr_dialog = []
+                    curr_user_id = -1
+                    for turn in datum["dialogue"]:
+                        if not turn["message"]:
+                            continue
+                        if curr_user_id == turn["user_id"]:
+                            curr_dialog[-1] += " " + turn["message"]
+                        else:
+                            curr_dialog.append(turn["message"])
+                        curr_user_id = turn["user_id"]
+                    for i in range(len(curr_dialog)):  
+                        self.data_for_response_generator[curr_set].append(curr_dialog[:i+1])
+
+        print(f"{'*'*5} train set: {len(self.data_for_response_generator['train_set'])}")
+        print(f"{'*'*5} dev set: {len(self.data_for_response_generator['dev_set'])}")
+        print(f"{'*'*5} test set: {len(self.data_for_response_generator['test_set'])}")
 
 
 # p = PhotochatPreprocessor()
