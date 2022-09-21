@@ -2,7 +2,7 @@ import re
 
 import numpy as np
 import torch
-from transformers import Trainer, EvalPrediction
+from transformers import Trainer
 from nltk.translate.bleu_score import corpus_bleu
 
 
@@ -48,6 +48,7 @@ class ResponseGeneratorTrainer():
         pred = [p.lower() for p in pred]
         special_chars = re.compile('[@_!#$%^&*()<>?/\|}{~:.,]')
         pred = list(filter(lambda token: token and not bool(special_chars.match(token)), pred))
+        pred = ['NONE'] if not pred else pred
 
         return pred
 
@@ -70,10 +71,11 @@ class ResponseGeneratorTrainer():
         preds_text, labels_text = [], []
         for pred, label in zip(preds, labels):
             preds_text.append(self.normalize_decode_per_token(pred))
-            labels_text.append(self.normalize_decode_per_token(label))
+            labels_text.append([self.normalize_decode_per_token(label)])
         # print(preds_text)
         # print(labels_text)
-        bleu = corpus_bleu(labels_text, preds_text, weights=(1,0,0,0))
+        # bleu = corpus_bleu(labels_text, preds_text, weights=(1,0,0,0))
+        bleu = 0
         
         # preds_text = self.tokenizer.batch_decode(preds, skip_special_tokens=True)
         # labels_text = self.tokenizer.batch_decode(labels, skip_special_tokens=True)
