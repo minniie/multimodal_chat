@@ -38,7 +38,7 @@ class ResponseGenerator():
         pred_text = self.tokenizer.decode(pred[0][:-1])
         pred_text = pred_text.replace(inp_text, "")
         if not pred_text:
-            pred_text = "nothing was generated." 
+            pred_text = "[END OF DIALOGUE]"
         
         print("======= input text =======")
         print(inp_text)

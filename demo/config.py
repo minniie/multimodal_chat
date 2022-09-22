@@ -13,4 +13,4 @@ class ImageRetrieverConfig(object):
 
 @dataclass
 class ResponseGeneratorConfig(object):
-    generator_model_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/v1_100/checkpoint-2500"
+    generator_model_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/dialogpt_large/checkpoint-12000"

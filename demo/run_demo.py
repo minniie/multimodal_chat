@@ -8,16 +8,7 @@ from demo.config import (
     ResponseGeneratorConfig
 )
 from model.response_generator import ResponseGenerator
-from util.text import (
-    truncate_context, 
-    join_context, 
-    split_context,
-    strip_context
-)
-
-
-USER_PREFIX = "User: "
-MODEL_PREFIX = "Bot: "
+from util.text import truncate_context
 
 
 app = Flask(__name__)
@@ -31,21 +22,10 @@ def run():
 @app.route("/send", methods=["POST"])
 def send():
     req_data = request.get_json(force=True)
-
-    # preprocess data 
-    context_displayed = req_data["context"]
-    context_displayed += "\n" + USER_PREFIX + req_data["message"]
-    context_displayed = context_displayed.strip()
-    # print(context_displayed)
-
-    context = strip_context(context_displayed, prefixes=[USER_PREFIX, MODEL_PREFIX])
-    context = split_context(context, sep="\n")
+    context = req_data["context"]
     context = truncate_context(context, max_context_len=12)
     response = response_generator.inference(context)
-    
-    # return output
-    context_displayed = context_displayed + "\n" + MODEL_PREFIX + response
-    res_data = {"context": context_displayed}
+    res_data = {"bot_response": response}
     
     return res_data
 

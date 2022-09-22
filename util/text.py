@@ -21,12 +21,3 @@ def split_context(
         sep: str
     ):
     return context.split(sep)
-
-
-def strip_context(
-        context: str,
-        prefixes: List[str]
-    ):
-    for prefix in prefixes:
-        context = context.replace(prefix, "")
-    return context

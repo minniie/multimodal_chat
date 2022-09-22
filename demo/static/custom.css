@@ -1,23 +1,42 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:300);
-
 .display-title {
-    color: #00325f;
+    color: 	#547cff;
     font-weight: bold;
     font-size: 40px;
     text-align: center;
     margin: 1em 0em 0em 0em;
 }
 
-.display-subtitle {
-    color: #0091b5;
-    font-weight: bold;
-    font-size: 30px;
-    text-align: center;
-}
-
 label[for*="header"] {
-    color: #457e81;
+    color: #313950;
     font-weight: bold;
     font-size: 18px;
     vertical-align: sub;
+}
+
+.dialog_history {
+    border-width: 2px;
+    border-style: solid;
+    border-color: #e6ebf2;
+    padding: 10px;
+    height: 500px;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.bot_msg {
+    border-radius: 10px;
+    padding: 7px 14px;
+    float: left;
+    clear: both;
+    background-color: #e6ebf2;
+    color: black;
+}
+
+.user_msg {
+    border-radius: 10px;
+    padding: 7px 14px;
+    float: right;
+    clear: both;
+    background-color: #547cff;
+    color: white;
 }

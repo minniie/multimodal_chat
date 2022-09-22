@@ -22,13 +22,10 @@
         <div class="row">
             <div class="col">
                 <div class="form-group">
-                    <label for="header">Dialogue context</label>
-                    <textarea class="form-control" id="context" placeholder="Current dialogue context" rows="12"></textarea>	
-                </div>
-                <div class="form-group">
-                    <label for="header">User message</label>
-                    <button type="submit" id="send_btn" class="btn btn-primary btn-sm float-right mb-2">Send</button>
-                    <textarea class="form-control" id="message" placeholder="Type message and press enter or click send" rows="2"></textarea>
+                    <div class="dialog_history">
+                        <p class="bot_msg">Hi, how are you?</p>
+                    </div>
+                    <textarea class="form-control" id="user_query" placeholder="Type message and press enter" rows="1"></textarea>
                 </div>
             </div>
         </div>
