@@ -4,8 +4,11 @@ from torch.nn.utils.rnn import pad_sequence
 
 class ImageRetrieverCollator():
 
-    def __init__(self):
-        pass
+    def __init__(
+            self,
+            processor
+        ):
+        self.processor = processor
 
 
 class ResponseGeneratorCollator():

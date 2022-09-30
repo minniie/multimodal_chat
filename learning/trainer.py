@@ -6,6 +6,14 @@ from transformers import Trainer
 from nltk.translate.bleu_score import corpus_bleu
 
 
+class ImageRetrieverTrainer():
+    
+    def __init__(
+            self
+        ):
+        pass
+
+
 class ResponseGeneratorTrainer():
     
     def __init__(
