@@ -24,7 +24,7 @@ class PhotochatPreprocessor():
 
     def preprocess(self):
         file_path_list = sorted(glob.glob("dataset/photochat/*/**"))
-        for file_path in [file_path_list[-1]]:
+        for file_path in file_path_list:
             with open(file_path) as f:
                 data = json.load(f)
                 for datum in data:
