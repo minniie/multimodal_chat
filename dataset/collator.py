@@ -1,5 +1,12 @@
+import warnings
+import requests
+
+from PIL import Image
 import torch
 from torch.nn.utils.rnn import pad_sequence
+
+
+IMAGE_DIM = 224
 
 
 class ImageRetrieverCollator():
@@ -13,8 +20,19 @@ class ImageRetrieverCollator():
         self.tokenizer = tokenizer
 
     def __call__(self, samples):
-        text = [self.tokenizer.sep_token.join(s[0]) for s in samples]
-        images = [s[1] for s in samples]
+        # exclude images with any exceptions or warnings
+        warnings.simplefilter("error")
+        images, text = [], []
+        print(samples)
+        # text = [self.tokenizer.sep_token.join(s[0]) for s in samples]
+        for s in samples:
+            try:
+                image = Image.open(requests.get(s[1], stream=True).raw).convert('RGB').resize((IMAGE_DIM, IMAGE_DIM))
+                images.append(image)
+                text.append(self.tokenizer.sep_token.join(s[0]))
+            except Exception as e:
+                print(f"Exception: {e}")
+                continue
         inputs = self.processor(
             text=text, images=images, return_tensors="pt", 
             padding="max_length", truncation=True, max_length=512
