@@ -3,10 +3,16 @@ import json
 import requests
 import time
 import warnings
+import psutil
+from sys import getsizeof
+import numpy as np
 
 from PIL import Image
 
 from util.text import clean_uttr, remove_empty_uttr
+
+
+IMAGE_DIM = 224
 
 
 class PhotochatPreprocessor():
@@ -30,6 +36,7 @@ class PhotochatPreprocessor():
 
         # iterate through raw dataset
         start_time = time.time()
+        start_mem = psutil.virtual_memory().percent
         file_path_list = sorted(glob.glob("dataset/dummy/*/**"))
         for file_path in file_path_list:
             with open(file_path) as f:
@@ -60,7 +67,7 @@ class PhotochatPreprocessor():
                 # data for image retriever
                 dialog_trunc = remove_empty_uttr(dialog_alternate[:share_photo_idx+1])
                 try:
-                    image = Image.open(requests.get(datum["photo_url"], stream=True).raw).convert('RGB')
+                    image = Image.open(requests.get(datum["photo_url"], stream=True).raw).convert('RGB').resize((IMAGE_DIM, IMAGE_DIM))
                 except Exception as e:
                     n_except_image += 1
                     print(f"Exception #{n_except_image}: {e}")
@@ -74,6 +81,7 @@ class PhotochatPreprocessor():
         
         warnings.simplefilter("default")
         print(f"{'*'*10} dataset preprocessing time: {(time.time()-start_time)/60:.3f} sec")
+        print(f"{'*'*10} dataset memory: {(psutil.virtual_memory().percent-start_mem):.3f} %")
 
         print(f"{'*'*10} image retriever")
         print(f"{'*'*5} train set: {len(self.data_for_image_retriever['train_set'])}")
