@@ -102,13 +102,7 @@ class ResponseGeneratorTrainer():
         for pred, label in zip(preds, labels):
             preds_text.append(self.normalize_decode_per_token(pred))
             labels_text.append([self.normalize_decode_per_token(label)])
-        # print(preds_text)
-        # print(labels_text)
         # bleu = corpus_bleu(labels_text, preds_text, weights=(1,0,0,0))
         bleu = 0
-        
-        # preds_text = self.tokenizer.batch_decode(preds, skip_special_tokens=True)
-        # labels_text = self.tokenizer.batch_decode(labels, skip_special_tokens=True)
-        # bleu = corpus_bleu(labels_text, preds_text, weights=(1,0,0,0))
         
         return {"bleu": bleu}

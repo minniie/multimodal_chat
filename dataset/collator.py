@@ -23,20 +23,21 @@ class ImageRetrieverCollator():
         # exclude images with any exceptions or warnings
         warnings.simplefilter("error")
         images, text = [], []
-        print(samples)
-        # text = [self.tokenizer.sep_token.join(s[0]) for s in samples]
         for s in samples:
             try:
-                image = Image.open(requests.get(s[1], stream=True).raw).convert('RGB').resize((IMAGE_DIM, IMAGE_DIM))
-                images.append(image)
-                text.append(self.tokenizer.sep_token.join(s[0]))
-            except Exception as e:
-                print(f"Exception: {e}")
+                i = Image.open(requests.get(s[1], stream=True).raw).convert('RGB').resize((IMAGE_DIM, IMAGE_DIM))
+                t = self.tokenizer.sep_token.join(s[0])
+                images.append(i)
+                text.append(t)
+            except:
                 continue
+        warnings.simplefilter("default")
+        
         inputs = self.processor(
             text=text, images=images, return_tensors="pt", 
             padding="max_length", truncation=True, max_length=512
         )
+        
         return {
             "input_ids": inputs.input_ids,
             "attention_mask": inputs.attention_mask,

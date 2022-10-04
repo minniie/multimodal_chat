@@ -30,14 +30,10 @@ class PhotochatPreprocessor():
         pass
 
     def preprocess(self):
-        # exclude images with any exceptions or warnings
-        warnings.simplefilter("error")
-        n_except_image = 0
-
         # iterate through raw dataset
         start_time = time.time()
         start_mem = psutil.virtual_memory().percent
-        file_path_list = sorted(glob.glob("dataset/dummy/*/**"))
+        file_path_list = sorted(glob.glob("dataset/photochat/*/**"))
         for file_path in file_path_list:
             with open(file_path) as f:
                 data = json.load(f)
@@ -66,13 +62,7 @@ class PhotochatPreprocessor():
                 
                 # data for image retriever
                 dialog_trunc = remove_empty_uttr(dialog_alternate[:share_photo_idx+1])
-                try:
-                    image = Image.open(requests.get(datum["photo_url"], stream=True).raw).convert('RGB').resize((IMAGE_DIM, IMAGE_DIM))
-                except Exception as e:
-                    n_except_image += 1
-                    print(f"Exception #{n_except_image}: {e}")
-                    continue
-                self.data_for_image_retriever[curr_set].append((dialog_trunc, image))
+                self.data_for_image_retriever[curr_set].append((dialog_trunc, datum["photo_url"]))
 
                 # data for response generator
                 dialog_alternate = remove_empty_uttr(dialog_alternate)
