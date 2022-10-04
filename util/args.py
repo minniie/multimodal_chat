@@ -8,21 +8,6 @@ from transformers import (
 
 
 @dataclass
-class DataArguments:
-    """
-    Arguments pertaining to what data we are going to input our model for training and eval
-    """
-    max_seq_len: int = field(
-        default=128,
-        metadata={
-            "help":
-            "The maximum total input sequence length after tokenization."
-            "Sequences longer than this will be truncated, sequences shorter will be padded."
-        },
-    )
-
-
-@dataclass
 class ModelArguments:
     """
     Arguments pertaining to which model/config/tokenizer we are going to fine-tune from
@@ -44,6 +29,21 @@ class ModelArguments:
         metadata={
             "help": "generator model name for response generator"
         }
+    )
+
+
+@dataclass
+class DataArguments:
+    """
+    Arguments pertaining to what data we are going to input our model for training and eval
+    """
+    max_seq_len: int = field(
+        default=128,
+        metadata={
+            "help":
+            "The maximum total input sequence length after tokenization."
+            "Sequences longer than this will be truncated, sequences shorter will be padded."
+        },
     )
 
 

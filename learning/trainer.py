@@ -9,6 +9,28 @@ from nltk.translate.bleu_score import corpus_bleu
 class ImageRetrieverTrainer():
     
     def __init__(
+            self,
+            training_args,
+            image_retriever,
+            dataset,
+            collator
+        ):
+        self.trainer = Trainer(
+            args=training_args,
+            model=image_retriever.model,
+            train_dataset=dataset["train_set"],
+            eval_dataset=dataset["dev_set"],
+            data_collator=collator
+        )
+        self.processor = image_retriever.processor
+
+    def train(
+            self
+        ):
+        self.trainer.train()
+        self.trainer.save_model()
+
+    def inference(
             self
         ):
         pass
