@@ -1,18 +1,9 @@
 import glob
 import json
-import requests
 import time
-import warnings
 import psutil
-from sys import getsizeof
-import numpy as np
-
-from PIL import Image
 
 from util.text import clean_uttr, remove_empty_uttr
-
-
-IMAGE_DIM = 224
 
 
 class PhotochatPreprocessor():
@@ -31,8 +22,6 @@ class PhotochatPreprocessor():
 
     def preprocess(self):
         # iterate through raw dataset
-        start_time = time.time()
-        start_mem = psutil.virtual_memory().percent
         file_path_list = sorted(glob.glob("dataset/photochat/*/**"))
         for file_path in file_path_list:
             with open(file_path) as f:
@@ -68,10 +57,6 @@ class PhotochatPreprocessor():
                 dialog_alternate = remove_empty_uttr(dialog_alternate)
                 dialog_per_uttr = [dialog_alternate[:i+1] for i in range(len(dialog_alternate))]
                 self.data_for_response_generator[curr_set].extend(dialog_per_uttr)
-        
-        warnings.simplefilter("default")
-        print(f"{'*'*10} dataset preprocessing time: {(time.time()-start_time)/60:.3f} sec")
-        print(f"{'*'*10} dataset memory: {(psutil.virtual_memory().percent-start_mem):.3f} %")
 
         print(f"{'*'*10} image retriever")
         print(f"{'*'*5} train set: {len(self.data_for_image_retriever['train_set'])}")
