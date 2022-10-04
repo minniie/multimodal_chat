@@ -13,9 +13,11 @@ class ImageRetriever():
 
     def __init__(
             self,
+            device,
             text_model_name_or_path: str = "bert-base-uncased",
             image_model_name_or_path: str = "google/vit-base-patch16-224"
         ):
+        self.device = device
         self.text_model_name_or_path = text_model_name_or_path
         self.image_model_name_or_path = image_model_name_or_path
         self.load_processor()
@@ -24,9 +26,9 @@ class ImageRetriever():
     def load_processor(
             self
         ):
-        tokenizer = BertTokenizer.from_pretrained(self.text_model_name_or_path)
-        feature_extractor = ViTFeatureExtractor.from_pretrained(self.image_model_name_or_path)
-        self.processor = VisionTextDualEncoderProcessor(feature_extractor, tokenizer)
+        self.tokenizer = BertTokenizer.from_pretrained(self.text_model_name_or_path)
+        self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.image_model_name_or_path)
+        self.processor = VisionTextDualEncoderProcessor(self.feature_extractor, self.tokenizer)
 
     def load_model(
             self
@@ -34,3 +36,9 @@ class ImageRetriever():
         self.model = VisionTextDualEncoderModel.from_vision_text_pretrained(
             self.image_model_name_or_path, self.text_model_name_or_path
         )
+        self.model.to(self.device)
+
+    def inference(
+            self
+        ):
+        pass

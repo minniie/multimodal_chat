@@ -10,8 +10,10 @@ class ResponseGenerator():
 
     def __init__(
             self,
+            device,
             generator_model_name_or_path: str = "gpt2"
         ):
+        self.device = device
         self.generator_model_name_or_path = generator_model_name_or_path
         self.load_tokenizer()
         self.load_model()
@@ -27,6 +29,7 @@ class ResponseGenerator():
         ):
         self.model = GPT2LMHeadModel.from_pretrained(self.generator_model_name_or_path)
         self.model.resize_token_embeddings(len(self.tokenizer))
+        self.model.to(self.device)
     
     def inference(
             self,
