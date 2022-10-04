@@ -6,9 +6,25 @@ class ImageRetrieverCollator():
 
     def __init__(
             self,
-            processor
+            processor,
+            tokenizer
         ):
         self.processor = processor
+        self.tokenizer = tokenizer
+
+    def __call__(self, samples):
+        text = [self.tokenizer.sep_token.join(s[0]) for s in samples]
+        images = [s[1] for s in samples]
+        inputs = self.processor(
+            text=text, images=images, return_tensors="pt", 
+            padding="max_length", truncation=True, max_length=512
+        )
+        return {
+            "input_ids": inputs.input_ids,
+            "attention_mask": inputs.attention_mask,
+            "pixel_values": inputs.pixel_values,
+            "return_loss": True,
+        }
 
 
 class ResponseGeneratorCollator():
@@ -22,10 +38,6 @@ class ResponseGeneratorCollator():
     def __call__(self, samples):
         contexts = [self.tokenizer.eos_token.join(s[:-1]) + self.tokenizer.eos_token for s in samples]
         responses = [s[-1] + self.tokenizer.eos_token for s in samples]
-        # print("==============")
-        # print(contexts)
-        # print("==============")
-        # print(responses)
     
         input_ids, labels = [], []
         for context, response in zip(contexts, responses):
@@ -40,9 +52,7 @@ class ResponseGeneratorCollator():
         input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id)
         attention_mask = input_ids != self.tokenizer.pad_token_id
         labels = pad_sequence(labels, batch_first=True, padding_value=-100)
-        # print(input_ids)
-        # print(attention_mask)
-        # print(labels)
+        
         return {
             "input_ids": input_ids,
             "attention_mask": attention_mask,
