@@ -1,4 +1,4 @@
-from dataset.preprocessor import PhotochatPreprocessor
+from dataset.processor import PhotochatProcessor
 from dataset.collator import ImageRetrieverCollator
 from model.image_retriever import ImageRetriever
 from learning.trainer import ImageRetrieverTrainer
@@ -23,7 +23,8 @@ def main():
 
     # load dataset and collator
     print(f"{'*'*10} Loading dataset")
-    p = PhotochatPreprocessor()
+    p = PhotochatProcessor()
+    p.split("dataset/photochat")
     dataset = p.data_for_image_retriever
     collator = ImageRetrieverCollator(image_retriever.processor, image_retriever.tokenizer)
 

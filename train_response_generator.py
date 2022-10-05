@@ -1,4 +1,4 @@
-from dataset.preprocessor import PhotochatPreprocessor
+from dataset.processor import PhotochatProcessor
 from dataset.collator import ResponseGeneratorCollator
 from model.response_generator import ResponseGenerator
 from learning.trainer import ResponseGeneratorTrainer
@@ -23,7 +23,8 @@ def main():
 
     # load dataset and collator
     print(f"{'*'*10} Loading dataset")
-    p = PhotochatPreprocessor()
+    p = PhotochatProcessor()
+    p.split("dataset/photochat")
     dataset = p.data_for_response_generator
     collator = ResponseGeneratorCollator(response_generator.tokenizer)
 
