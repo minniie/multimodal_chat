@@ -15,11 +15,13 @@ class ImageRetriever():
             self,
             device,
             text_model_name_or_path: str = "bert-base-uncased",
-            image_model_name_or_path: str = "google/vit-base-patch16-224"
+            image_model_name_or_path: str = "google/vit-base-patch16-224",
+            multimodal_model_name_or_path: str = None
         ):
         self.device = device
         self.text_model_name_or_path = text_model_name_or_path
         self.image_model_name_or_path = image_model_name_or_path
+        self.multimodal_model_name_or_path = multimodal_model_name_or_path
         self.load_processor()
         self.load_model()
 
@@ -33,9 +35,14 @@ class ImageRetriever():
     def load_model(
             self
         ):
-        self.model = VisionTextDualEncoderModel.from_vision_text_pretrained(
-            self.image_model_name_or_path, self.text_model_name_or_path
-        )
+        if self.multimodal_model_name_or_path:
+            self.model = VisionTextDualEncoderModel.from_pretrained(
+                self.multimodal_model_name_or_path
+            )
+        else:
+            self.model = VisionTextDualEncoderModel.from_vision_text_pretrained(
+                self.image_model_name_or_path, self.text_model_name_or_path
+            )
         self.model.to(self.device)
 
     def inference(

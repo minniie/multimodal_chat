@@ -1,12 +1,14 @@
 import glob
 import json
-import time
-import psutil
+import os
+
+import torch
 
 from util.text import clean_uttr, remove_empty_uttr
+from util.image import load_image_from_url
 
 
-class PhotochatPreprocessor():
+class PhotochatProcessor():
     
     def __init__(self):
         self.data_for_image_retriever = {
@@ -15,14 +17,11 @@ class PhotochatPreprocessor():
         self.data_for_response_generator = {
             "train_set": [], "dev_set": [], "test_set": []
         }
-        self.preprocess()
+        self.images = []
 
-    def download(self):
-        pass
-
-    def preprocess(self):
+    def split(self, path):
         # iterate through raw dataset
-        file_path_list = sorted(glob.glob("dataset/photochat/*/**"))
+        file_path_list = sorted(glob.glob(path+"/*/**"))
         for file_path in file_path_list:
             with open(file_path) as f:
                 data = json.load(f)
@@ -67,3 +66,24 @@ class PhotochatPreprocessor():
         print(f"{'*'*5} train set: {len(self.data_for_response_generator['train_set'])}")
         print(f"{'*'*5} dev set: {len(self.data_for_response_generator['dev_set'])}")
         print(f"{'*'*5} test set: {len(self.data_for_response_generator['test_set'])}")
+
+    def load(self, raw_path, processed_path, processor):
+        # load processed images
+        if os.path.exists(processed_path):
+            images_processed = torch.load(processed_path)
+        
+        # iterate through raw dataset and save processed images
+        else:
+            image_urls = []
+            file_path_list = sorted(glob.glob(raw_path+"/*/**"))
+            for file_path in file_path_list:
+                with open(file_path) as f:
+                    data = json.load(f)
+                image_urls.extend(d["photo_url"] for d in data)
+            image_urls = image_urls[:10]
+            images = [load_image_from_url(u) for u in image_urls]
+            images_processed = processor(images=images, return_tensors="pt")
+            images_processed = images_processed.pixel_values
+            torch.save(images_processed, processed_path)            
+        
+        self.images = images_processed

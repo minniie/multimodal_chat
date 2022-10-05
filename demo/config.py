@@ -8,9 +8,15 @@ class ServeConfig(object):
 
 @dataclass
 class ImageRetrieverConfig(object):
-    pass
+    model_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/bert_vit/checkpoint-6400"
 
 
 @dataclass
 class ResponseGeneratorConfig(object):
-    generator_model_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/dialogpt_large/checkpoint-12000"
+    model_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/dialogpt_large/checkpoint-12000"
+
+
+@dataclass
+class DataConfig(object):
+    images_raw_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/dummy"
+    images_processed_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/dummy/images_processed.pt"

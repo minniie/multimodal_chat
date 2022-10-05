@@ -5,10 +5,14 @@ from flask import Flask, request, render_template
 from demo.config import (
     ServeConfig,
     ImageRetrieverConfig,
-    ResponseGeneratorConfig
+    ResponseGeneratorConfig,
+    DataConfig
 )
+from model.image_retriever import ImageRetriever
 from model.response_generator import ResponseGenerator
+from dataset.processor import PhotochatProcessor
 from util.text import truncate_context
+from util.resource import set_device, get_device_util
 
 
 app = Flask(__name__)
@@ -35,10 +39,38 @@ if __name__ == "__main__":
     serve_config = ServeConfig()
     image_retriever_config = ImageRetrieverConfig()
     response_generator_config = ResponseGeneratorConfig()
+    data_config = DataConfig()
+
+    # set device
+    device = set_device()
+
+    # load image retriever
+    print(f"{'*'*10} Loading image retriever")
+    image_retriever = ImageRetriever(
+        device=device,
+        multimodal_model_name_or_path=image_retriever_config.model_path
+    )
 
     # load response generator
     print(f"{'*'*10} Loading response generator")
-    response_generator = ResponseGenerator(response_generator_config.generator_model_path)
+    response_generator = ResponseGenerator(
+        device=device,
+        generator_model_name_or_path=response_generator_config.model_path
+    )
+
+    # load images
+    print(f"{'*'*10} Loading images")
+    p = PhotochatProcessor()
+    p.load(
+        raw_path=data_config.images_raw_path,
+        processed_path=data_config.images_processed_path,
+        processor=image_retriever.processor
+    )
+    images = p.images
+
+    # get device util
+    print(f"{'*'*10} Device util after loading all models")
+    get_device_util()
 
     # args for app
     parser = argparse.ArgumentParser()
