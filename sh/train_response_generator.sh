@@ -1,5 +1,6 @@
 CUDA_VISIBLE_DEVICES=5 \
 python3 train_response_generator.py \
+    --dataset_path /mnt/16tb/minyoung/code/photochat/dataset/dummy \
     --generator_model_name gpt2-large \
     --output_dir /mnt/16tb/minyoung/checkpoints/photochat/gpt2_large \
     --save_strategy steps \

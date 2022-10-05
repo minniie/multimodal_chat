@@ -24,7 +24,7 @@ def main():
     # load dataset and collator
     print(f"{'*'*10} Loading dataset")
     p = PhotochatProcessor()
-    p.split("dataset/photochat")
+    p.split(data_args.dataset_path)
     dataset = p.data_for_image_retriever
     collator = ImageRetrieverCollator(image_retriever.processor, image_retriever.tokenizer)
 

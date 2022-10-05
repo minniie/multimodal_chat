@@ -1,5 +1,6 @@
 CUDA_VISIBLE_DEVICES=6 \
 python3 train_image_retriever.py \
+    --dataset_path /mnt/16tb/minyoung/code/photochat/dataset/dummy \
     --text_model_name bert-base-uncased \
     --image_model_name google/vit-base-patch16-224 \
     --output_dir /mnt/16tb/minyoung/checkpoints/photochat/bert_vit \

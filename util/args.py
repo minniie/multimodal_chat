@@ -37,6 +37,12 @@ class DataArguments:
     """
     Arguments pertaining to what data we are going to input our model for training and eval
     """
+    dataset_path: str = field(
+        default=None,
+        metadata={
+            "help": "dataset path to train models"
+        }
+    )
     max_seq_len: int = field(
         default=128,
         metadata={
