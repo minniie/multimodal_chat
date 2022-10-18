@@ -4,6 +4,7 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 
 from util.image import load_image_from_url
+from util.text import join_dialog
 
 
 class ImageRetrieverCollator():
@@ -22,7 +23,7 @@ class ImageRetrieverCollator():
             image = load_image_from_url(s[1])
             if image:
                 images.append(image)
-                text.append(self.tokenizer.sep_token.join(s[0]))
+                text.append(join_dialog(s[0], self.tokenizer.sep_token))
         
         inputs = self.processor(
             text=text, images=images, return_tensors="pt", 
@@ -46,7 +47,7 @@ class ResponseGeneratorCollator():
         self.tokenizer = tokenizer
 
     def __call__(self, samples):
-        contexts = [self.tokenizer.eos_token.join(s[:-1]) + self.tokenizer.eos_token for s in samples]
+        contexts = [join_dialog(s[:-1], self.tokenizer.eos_token) + self.tokenizer.eos_token for s in samples]
         responses = [s[-1] + self.tokenizer.eos_token for s in samples]
     
         input_ids, labels = [], []

@@ -1,6 +1,6 @@
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 
-from util.text import join_context
+from util.text import join_dialog
 
 
 class ResponseGenerator():
@@ -35,7 +35,7 @@ class ResponseGenerator():
             self,
             context
         ):
-        inp_text = join_context(context, self.tokenizer.eos_token) + self.tokenizer.eos_token
+        inp_text = join_dialog(context, self.tokenizer.eos_token) + self.tokenizer.eos_token
         inp = self.tokenizer.encode(inp_text, return_tensors="pt").to(self.model.device)
         pred = self.model.generate(inp, max_length=64, num_beams=1, do_sample=True)
         pred_text = self.tokenizer.decode(pred[0][:-1])
