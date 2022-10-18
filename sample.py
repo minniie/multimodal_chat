@@ -29,7 +29,10 @@ outputs = model(
     pixel_values=inputs.pixel_values,
     return_loss=True,
 )
+# ['loss', 'logits_per_image', 'logits_per_text', 'text_embeds', 'image_embeds', 'text_model_output', 'vision_model_output']
+# print(outputs.keys())
 loss, logits_per_image = outputs.loss, outputs.logits_per_image  # this is the image-text similarity score
+print(loss)
 
 # save and load from pretrained
 model.save_pretrained("vit-bert")
