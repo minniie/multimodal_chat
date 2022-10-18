@@ -1,9 +1,14 @@
+import torch
+import torch.nn.functional as F
 from transformers import (
     VisionTextDualEncoderModel,
     VisionTextDualEncoderProcessor,
     ViTFeatureExtractor,
     BertTokenizer,
 )
+import numpy as np
+
+from util.text import join_dialog
 
 
 class ImageRetriever():
@@ -46,6 +51,26 @@ class ImageRetriever():
         self.model.to(self.device)
 
     def inference(
-            self
+            self,
+            device,
+            context,
+            response,
+            images
         ):
-        pass
+        context.append(response)
+        text = join_dialog(context, self.tokenizer.sep_token)
+        print("======= input text =======")
+        print(text)
+        inputs = self.processor(text=text, return_tensors="pt", padding=True)
+        images_pixel, images_url = images
+        outputs = self.model(
+            input_ids=inputs.input_ids.to(device),
+            attention_mask=inputs.attention_mask.to(device),
+            pixel_values=images_pixel.to(device)
+        )
+        logits_per_image = outputs.logits_per_image
+        probs_per_image = F.softmax(logits_per_image.squeeze(), dim=0)
+        idx = torch.argmax(probs_per_image, dim=-1).item()
+        image_url = images_url[idx]
+
+        return image_url

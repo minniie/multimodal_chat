@@ -70,20 +70,23 @@ class PhotochatProcessor():
     def load(self, raw_path, processed_path, processor):
         # load processed images
         if os.path.exists(processed_path):
-            images_processed = torch.load(processed_path)
+            images = torch.load(processed_path)
         
-        # iterate through raw dataset and save processed images
+        # iterate through raw dataset and save processed images pixels and urls
         else:
-            image_urls = []
+            images_url_unfiltered, images_url, images_raw = [], [], []
             file_path_list = sorted(glob.glob(raw_path+"/*/**"))
             for file_path in file_path_list:
                 with open(file_path) as f:
                     data = json.load(f)
-                image_urls.extend(d["photo_url"] for d in data)
-            image_urls = image_urls[:10]
-            images = [load_image_from_url(u) for u in image_urls]
-            images_processed = processor(images=images, return_tensors="pt")
-            images_processed = images_processed.pixel_values
-            torch.save(images_processed, processed_path)            
+                images_url_unfiltered.extend(d["photo_url"] for d in data)
+            for url in images_url_unfiltered:
+                image = load_image_from_url(url)
+                if image:
+                    images_url.append(url)
+                    images_raw.append(image)
+            images_pixel = processor(images=images_raw, return_tensors="pt").pixel_values
+            images = [images_pixel, images_url]
+            torch.save(images, processed_path)
         
-        self.images = images_processed
+        self.images = images

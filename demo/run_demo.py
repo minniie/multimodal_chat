@@ -11,7 +11,7 @@ from demo.config import (
 from model.image_retriever import ImageRetriever
 from model.response_generator import ResponseGenerator
 from dataset.processor import PhotochatProcessor
-from util.text import truncate_context
+from util.text import truncate_dialog
 from util.resource import set_device, get_device_util
 
 
@@ -27,9 +27,10 @@ def run():
 def send():
     req_data = request.get_json(force=True)
     context = req_data["context"]
-    context = truncate_context(context, max_context_len=12)
+    context = truncate_dialog(context, max_context_len=12)
     response = response_generator.inference(context)
-    res_data = {"bot_response": response}
+    image_url = image_retriever.inference(device, context, response, images)
+    res_data = {"bot_response": response, "image_url": image_url}
     
     return res_data
 

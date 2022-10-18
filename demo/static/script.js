@@ -21,7 +21,7 @@ $('#user_query').keypress(function(e) {
             context.push(context_list[i].innerText);
         }
         
-        // call flask endpoint
+        // call endpoint
         $.ajax({
             url: '/send',
             method: 'post',
@@ -31,6 +31,7 @@ $('#user_query').keypress(function(e) {
             success: function(res_data) {
                 var dialog_history = document.querySelector(".dialog_history");
                 dialog_history.innerHTML += `<p class="bot_msg">${res_data.bot_response}</p>`;
+                dialog_history.innerHTML += `<img class=image src=${res_data.image_url}>`;
                 $('.dialog_history').scrollTop($('.dialog_history')[0].scrollHeight);
             }
         });

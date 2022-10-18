@@ -40,3 +40,14 @@ label[for*="header"] {
     background-color: #547cff;
     color: white;
 }
+
+.image {
+    width: 224px;
+    height: 224px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #e6ebf2;
+    float: left;
+    clear: both;
+    margin-bottom: 14px;
+}

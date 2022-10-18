@@ -18,5 +18,5 @@ class ResponseGeneratorConfig(object):
 
 @dataclass
 class DataConfig(object):
-    images_raw_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/dummy"
-    images_processed_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/dummy/images_processed.pt"
+    images_raw_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/photochat"
+    images_processed_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/photochat/images_processed.pt"
