@@ -52,6 +52,14 @@ if __name__ == "__main__":
         multimodal_model_name_or_path=image_retriever_config.model_path
     )
 
+    # load images
+    print(f"{'*'*10} Loading images")
+    images = image_retriever.load_images(
+        device=device,
+        raw_path=data_config.images_raw_path,
+        processed_path=data_config.images_processed_path
+    )
+
     # load response generator
     print(f"{'*'*10} Loading response generator")
     response_generator = ResponseGenerator(
@@ -59,18 +67,8 @@ if __name__ == "__main__":
         generator_model_name_or_path=response_generator_config.model_path
     )
 
-    # load images
-    print(f"{'*'*10} Loading images")
-    p = PhotochatProcessor()
-    p.load(
-        raw_path=data_config.images_raw_path,
-        processed_path=data_config.images_processed_path,
-        processor=image_retriever.processor
-    )
-    images = p.images
-
     # get device util
-    print(f"{'*'*10} Device util after loading all models")
+    print(f"{'*'*10} Device util after loading all models and data")
     get_device_util()
 
     # args for app

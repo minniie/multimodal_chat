@@ -1,11 +1,7 @@
 import glob
 import json
-import os
-
-import torch
 
 from util.text import clean_uttr, remove_empty_uttr
-from util.image import load_image_from_url
 
 
 class PhotochatProcessor():
@@ -66,27 +62,3 @@ class PhotochatProcessor():
         print(f"{'*'*5} train set: {len(self.data_for_response_generator['train_set'])}")
         print(f"{'*'*5} dev set: {len(self.data_for_response_generator['dev_set'])}")
         print(f"{'*'*5} test set: {len(self.data_for_response_generator['test_set'])}")
-
-    def load(self, raw_path, processed_path, processor):
-        # load processed images
-        if os.path.exists(processed_path):
-            images = torch.load(processed_path)
-        
-        # iterate through raw dataset and save processed images pixels and urls
-        else:
-            images_url_unfiltered, images_url, images_raw = [], [], []
-            file_path_list = sorted(glob.glob(raw_path+"/*/**"))
-            for file_path in file_path_list:
-                with open(file_path) as f:
-                    data = json.load(f)
-                images_url_unfiltered.extend(d["photo_url"] for d in data)
-            for url in images_url_unfiltered:
-                image = load_image_from_url(url)
-                if image:
-                    images_url.append(url)
-                    images_raw.append(image)
-            images_pixel = processor(images=images_raw, return_tensors="pt").pixel_values
-            images = [images_pixel, images_url]
-            torch.save(images, processed_path)
-        
-        self.images = images

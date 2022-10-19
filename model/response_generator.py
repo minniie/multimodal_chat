@@ -42,12 +42,5 @@ class ResponseGenerator():
         pred_text = pred_text.replace(inp_text, "")
         if not pred_text:
             pred_text = "[END OF DIALOGUE]"
-        
-        print("======= input text =======")
-        print(inp_text)
-        print("======= pred text =======")
-        print(pred_text)
-        print("======= pred text original =======")
-        print(self.tokenizer.decode(pred[0]))
 
         return pred_text
