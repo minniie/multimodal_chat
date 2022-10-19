@@ -83,7 +83,7 @@ class ImageRetriever():
                 if image:
                     image_urls.append(url)
                     pixel = self.processor(images=image, return_tensors="pt").pixel_values
-                    feature = self.model.get_image_embeds(pixel.to(device))
+                    feature = self.model.get_image_features(pixel.to(device))
                     image_embeds.append(feature.detach().cpu())
             images = [image_embeds, image_urls]
             torch.save(images, processed_path)
