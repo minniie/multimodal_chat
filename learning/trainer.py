@@ -3,7 +3,8 @@ import re
 import numpy as np
 import torch
 from transformers import Trainer
-from nltk.translate.bleu_score import corpus_bleu
+
+from util.metric import Perplexity, BLEU, DistinctN
 
 
 class ImageRetrieverTrainer():
@@ -52,7 +53,6 @@ class ResponseGeneratorTrainer():
             train_dataset=dataset["train_set"],
             eval_dataset=dataset["dev_set"],
             data_collator=collator,
-            preprocess_logits_for_metrics=self.preprocess_logits_for_metrics,
             compute_metrics=self.compute_metrics
         )
         self.tokenizer = response_generator.tokenizer
@@ -82,19 +82,13 @@ class ResponseGeneratorTrainer():
 
         return pred
 
-    @staticmethod
-    def preprocess_logits_for_metrics(
-            logits,
-            labels
-        ):
-        preds = torch.argmax(logits, dim=-1)
-        return preds, labels
-
     def compute_metrics(
             self,
             prediction
         ):
-        preds, labels = prediction.predictions[0].copy(), prediction.label_ids.copy()
+        logits, labels = prediction.predictions.copy(), prediction.label_ids.copy()
+        preds = np.argmax(logits, axis=-1)
+        labels_original = labels.copy()
         preds[preds == -100] = self.tokenizer.pad_token_id
         labels[labels == -100] = self.tokenizer.pad_token_id
         
@@ -102,7 +96,9 @@ class ResponseGeneratorTrainer():
         for pred, label in zip(preds, labels):
             preds_text.append(self.normalize_decode_per_token(pred))
             labels_text.append([self.normalize_decode_per_token(label)])
-        # bleu = corpus_bleu(labels_text, preds_text, weights=(1,0,0,0))
-        bleu = 0
         
-        return {"bleu": bleu}
+        ppl = Perplexity(logits, labels_original)
+        bleu = BLEU(preds_text, labels_text)
+        distinct_n = DistinctN(preds_text, labels_text)
+        
+        return {**ppl, **bleu, **distinct_n}

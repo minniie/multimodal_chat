@@ -90,7 +90,6 @@ class ImageRetriever():
         
         return images
 
-
     def inference(
             self,
             device,

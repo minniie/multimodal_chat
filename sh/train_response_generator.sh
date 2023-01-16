@@ -4,8 +4,8 @@ python3 train_response_generator.py \
     --generator_model_name gpt2-large \
     --output_dir /mnt/16tb/minyoung/checkpoints/photochat/gpt2_large_dummy \
     --num_train_epochs 5 \
-    --per_device_train_batch_size 8 \
-    --gradient_accumulation_steps 2 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 8 \
     --per_device_eval_batch_size 16 \
     --evaluation_strategy steps \
     --eval_steps 100 \
