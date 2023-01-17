@@ -14,15 +14,15 @@ def main():
     device = set_device()
 
     # load model
-    print(f"{'*'*10} Loading model")
+    print("> Loading model")
     image_retriever = ImageRetriever(device, model_args.text_model_name, model_args.image_model_name)
     
     # get device util
-    print(f"{'*'*10} Device util after loading model")
+    print("> Device util after loading model")
     get_device_util()
 
     # load dataset and collator
-    print(f"{'*'*10} Loading dataset")
+    print("> Loading dataset")
     p = PhotochatProcessor()
     p.split(data_args.dataset_path)
     dataset = p.data_for_image_retriever

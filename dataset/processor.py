@@ -53,12 +53,13 @@ class PhotochatProcessor():
                 dialog_per_uttr = [dialog_alternate[:i+1] for i in range(len(dialog_alternate))]
                 self.data_for_response_generator[curr_set].extend(dialog_per_uttr)
 
-        print(f"{'*'*10} image retriever")
-        print(f"{'*'*5} train set: {len(self.data_for_image_retriever['train_set'])}")
-        print(f"{'*'*5} dev set: {len(self.data_for_image_retriever['dev_set'])}")
-        print(f"{'*'*5} test set: {len(self.data_for_image_retriever['test_set'])}")
-
-        print(f"{'*'*10} response generator")
-        print(f"{'*'*5} train set: {len(self.data_for_response_generator['train_set'])}")
-        print(f"{'*'*5} dev set: {len(self.data_for_response_generator['dev_set'])}")
-        print(f"{'*'*5} test set: {len(self.data_for_response_generator['test_set'])}")
+        print(
+            f"> image retriever\n"
+            f"> train set\n{len(self.data_for_image_retriever['train_set'])}\n"
+            f"> dev set\n{len(self.data_for_image_retriever['dev_set'])}\n"
+            f"> test set\n{len(self.data_for_image_retriever['test_set'])}\n"
+            f"> response generator\n"
+            f"> train set\n{len(self.data_for_response_generator['train_set'])}\n"
+            f"> dev set\n{len(self.data_for_response_generator['dev_set'])}\n"
+            f"> test set\n{len(self.data_for_response_generator['test_set'])}\n"
+        )

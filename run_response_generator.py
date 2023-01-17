@@ -14,15 +14,15 @@ def main():
     device = set_device()
 
     # load model
-    print(f"{'*'*10} Loading model")
+    print("... Loading model")
     response_generator = ResponseGenerator(device, model_args.generator_model_name)
 
     # get device util
-    print(f"{'*'*10} Device util after loading model")
+    print(f"... Device util after loading model")
     get_device_util()
 
     # load dataset and collator
-    print(f"{'*'*10} Loading dataset")
+    print(f"... Loading dataset")
     p = PhotochatProcessor()
     p.split(data_args.dataset_path)
     dataset = p.data_for_response_generator
