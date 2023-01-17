@@ -23,9 +23,9 @@ def main():
 
     # load dataset and collator
     print(f"... Loading dataset")
-    p = PhotochatProcessor()
-    p.split(data_args.dataset_path)
-    dataset = p.data_for_response_generator
+    processor = PhotochatProcessor()
+    processor.split(data_args.dataset_path)
+    dataset = processor.data_for_response_generator
     collator = ResponseGeneratorCollator(response_generator.tokenizer)
 
     # set trainer

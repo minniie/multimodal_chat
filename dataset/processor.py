@@ -61,5 +61,5 @@ class PhotochatProcessor():
             f"> response generator\n"
             f"> train set\n{len(self.data_for_response_generator['train_set'])}\n"
             f"> dev set\n{len(self.data_for_response_generator['dev_set'])}\n"
-            f"> test set\n{len(self.data_for_response_generator['test_set'])}\n"
+            f"> test set\n{len(self.data_for_response_generator['test_set'])}"
         )

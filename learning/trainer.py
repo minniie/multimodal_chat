@@ -104,7 +104,7 @@ class ResponseGeneratorTrainer():
             self,
             prediction
         ):
-        logits, labels = prediction.predictions, prediction.label_ids
+        logits, labels = prediction.predictions[0], prediction.label_ids
         preds = np.argmax(logits, axis=-1)
         labels_original = labels.copy()
         preds[preds == -100] = self.tokenizer.pad_token_id
