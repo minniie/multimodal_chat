@@ -1,7 +1,7 @@
 import re
+from argparse import ArgumentError
 
 import numpy as np
-import torch
 from transformers import Trainer
 
 from util.metric import Perplexity, BLEU, DistinctN
@@ -21,20 +21,29 @@ class ImageRetrieverTrainer():
             model=image_retriever.model,
             train_dataset=dataset["train_set"],
             eval_dataset=dataset["dev_set"],
-            data_collator=collator
+            data_collator=collator,
+            preprocess_logits_for_metrics=self.preprocess_logits_for_metrics
         )
         self.processor = image_retriever.processor
 
-    def train(
-            self
+    def run(
+            self,
+            task_args
         ):
-        self.trainer.train()
-        self.trainer.save_model()
+        if task_args.task == "training":
+            self.trainer.train()
+            self.trainer.save_model()
+        elif task_args.task == "evaluation":
+            self.trainer.evaluate()
+        else:
+            raise ArgumentError(f"Task name should be training or evaluation: {task_args.task}")
 
-    def inference(
-            self
+    @staticmethod
+    def preprocess_logits_for_metrics(
+            logits,
+            labels
         ):
-        pass
+        return logits.to("cpu"), labels.to("cpu")
 
 
 class ResponseGeneratorTrainer():
@@ -53,20 +62,29 @@ class ResponseGeneratorTrainer():
             train_dataset=dataset["train_set"],
             eval_dataset=dataset["dev_set"],
             data_collator=collator,
+            preprocess_logits_for_metrics=self.preprocess_logits_for_metrics,
             compute_metrics=self.compute_metrics
         )
         self.tokenizer = response_generator.tokenizer
 
-    def train(
-            self
+    def run(
+            self,
+            task_args
         ):
-        self.trainer.train()
-        self.trainer.save_model()
+        if task_args.task == "training":
+            self.trainer.train()
+            self.trainer.save_model()
+        elif task_args.task == "evaluation":
+            self.trainer.evaluate()
+        else:
+            raise ArgumentError(f"Task name should be training or evaluation: {task_args.task}")
 
-    def inference(
-            self
+    @staticmethod
+    def preprocess_logits_for_metrics(
+            logits,
+            labels
         ):
-        pass
+        return logits.to("cpu"), labels.to("cpu")
 
     def normalize_decode_per_token(
             self,
@@ -86,7 +104,7 @@ class ResponseGeneratorTrainer():
             self,
             prediction
         ):
-        logits, labels = prediction.predictions.copy(), prediction.label_ids.copy()
+        logits, labels = prediction.predictions, prediction.label_ids
         preds = np.argmax(logits, axis=-1)
         labels_original = labels.copy()
         preds[preds == -100] = self.tokenizer.pad_token_id

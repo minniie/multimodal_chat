@@ -1,6 +1,6 @@
 CUDA_VISIBLE_DEVICES=3 \
 python3 run_image_retriever.py \
-    --task training \
+    --task evaluation \
     --dataset_path /mnt/16tb/minyoung/code/photochat/dataset/photochat \
     --text_model_name bert-base-uncased \
     --image_model_name google/vit-base-patch16-224 \

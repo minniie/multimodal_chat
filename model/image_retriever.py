@@ -11,11 +11,9 @@ from transformers import (
     ViTFeatureExtractor,
     BertTokenizer,
 )
-import numpy as np
 
 from util.text import join_dialog
 from util.image import load_image_from_url
-from util.resource import get_device_util
 
 
 LOGIT_SCALE_INIT_VALUE = 2.6592

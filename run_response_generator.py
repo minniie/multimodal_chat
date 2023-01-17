@@ -8,7 +8,7 @@ from util.resource import set_device, get_device_util
 
 def main():
     # set arguments
-    model_args, data_args, training_args = set_args()
+    model_args, data_args, task_args, training_args = set_args()
 
     # set device
     device = set_device()
@@ -35,7 +35,7 @@ def main():
         dataset,
         collator
     )
-    trainer.train()
+    trainer.run(task_args)
 
 
 if __name__ == "__main__":

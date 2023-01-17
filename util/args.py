@@ -10,7 +10,7 @@ from transformers import (
 @dataclass
 class ModelArguments:
     """
-    Arguments pertaining to which model/config/tokenizer we are going to fine-tune from
+    Arguments for which model will be trained or evaluated
     """
     text_model_name: str = field(
         default=None,
@@ -35,7 +35,7 @@ class ModelArguments:
 @dataclass
 class DataArguments:
     """
-    Arguments pertaining to what data we are going to input our model for training and eval
+    Arguments for dataset to train and evaluate the models
     """
     dataset_path: str = field(
         default=None,
@@ -53,9 +53,22 @@ class DataArguments:
     )
 
 
+@dataclass
+class TaskArguments:
+    """
+    Arguments for which task the script is used for
+    """
+    task: str = field(
+        default=None,
+        metadata={
+            "help": "training or evaluation"
+        }
+    )
+
+
 def set_args():
-    parser = HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
-    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    parser = HfArgumentParser((ModelArguments, DataArguments, TaskArguments, TrainingArguments))
+    model_args, data_args, task_args, training_args = parser.parse_args_into_dataclasses()
     set_seed(training_args.seed)
 
-    return model_args, data_args, training_args
+    return model_args, data_args, task_args, training_args
