@@ -1,10 +1,9 @@
 # photochat
 Princeton senior thesis
 
-
 ### Install requirements
 ```
-pip install -r requirements.txt
+sh setup.sh
 ```
 
 ### Run demo
@@ -12,12 +11,14 @@ pip install -r requirements.txt
 CUDA_VISIBLE_DEVICES=${id} python -m demo.run_demo
 ```
 
-### Train image retriever
+### Train and evaluate image retriever
 ```
 sh sh/train_image_retriever.sh
+sh sh/eval_image_retriever.sh
 ```
 
-### Train response generator
+### Train and evaluate response generator
 ```
 sh sh/train_response_generator.sh
+sh sh/eval_response_generator.sh
 ```
