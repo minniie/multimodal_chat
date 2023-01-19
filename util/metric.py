@@ -8,7 +8,7 @@ def Perplexity(logits, labels):
     logits_batch = torch.tensor(logits).transpose(1, 2)
     labels_batch = torch.tensor(labels)
     loss = loss_fn(logits_batch, labels_batch)
-    ppl = torch.exp(loss).item()
+    ppl = torch.exp(loss)
     
     return {
         "ppl": ppl

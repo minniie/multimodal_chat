@@ -1,6 +1,7 @@
 import re
 from argparse import ArgumentError
 
+import torch
 import numpy as np
 from transformers import Trainer
 
@@ -79,12 +80,15 @@ class ResponseGeneratorTrainer():
         else:
             raise ArgumentError(f"Task name should be training or evaluation: {task_args.task}")
 
-    @staticmethod
     def preprocess_logits_for_metrics(
+            self,
             logits,
             labels
         ):
-        return logits.to("cpu"), labels.to("cpu")
+        preds = torch.argmax(logits, axis=-1)
+        ppl = Perplexity(logits, labels)["ppl"]
+
+        return ppl, preds.to("cpu"), labels.to("cpu")
 
     def normalize_decode_per_token(
             self,
@@ -104,9 +108,7 @@ class ResponseGeneratorTrainer():
             self,
             prediction
         ):
-        logits, labels = prediction.predictions[0], prediction.label_ids
-        preds = np.argmax(logits, axis=-1)
-        labels_original = labels.copy()
+        ppl, preds, labels = prediction.predictions
         preds[preds == -100] = self.tokenizer.pad_token_id
         labels[labels == -100] = self.tokenizer.pad_token_id
         
@@ -115,7 +117,7 @@ class ResponseGeneratorTrainer():
             preds_text.append(self.normalize_decode_per_token(pred))
             labels_text.append([self.normalize_decode_per_token(label)])
         
-        ppl = Perplexity(logits, labels_original)
+        ppl = {"ppl": np.mean(ppl)}
         bleu = BLEU(preds_text, labels_text)
         distinct_n = DistinctN(preds_text, labels_text)
         
