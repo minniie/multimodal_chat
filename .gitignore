@@ -1,0 +1,4 @@
+__pycache__/
+dataset/dummy/
+dataset/photochat/
+vit-bert/

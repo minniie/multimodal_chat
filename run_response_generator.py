@@ -26,7 +26,10 @@ def main():
     processor = PhotochatProcessor()
     processor.split(data_args.dataset_path)
     dataset = processor.data_for_response_generator
-    collator = ResponseGeneratorCollator(response_generator.tokenizer)
+    collator = ResponseGeneratorCollator(
+        response_generator.tokenizer,
+        model_args.use_image_as_generator_input
+    )
 
     # set trainer
     trainer = ResponseGeneratorTrainer(

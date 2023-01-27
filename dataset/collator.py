@@ -1,9 +1,9 @@
-import warnings
-
+from unittest.mock import patch
 import torch
 from torch.nn.utils.rnn import pad_sequence
+from torchvision.transforms import ToTensor
 
-from util.image import load_image_from_url
+from util.image import load_image_from_url, create_dummy_image
 from util.text import join_dialog
 
 
@@ -19,11 +19,12 @@ class ImageRetrieverCollator():
 
     def __call__(self, samples):
         images, text = [], []
-        for s in samples:
-            image = load_image_from_url(s[1])
+        for sample in samples:
+            text_sample, image_sample = sample[0], sample[1]
+            image = load_image_from_url(image_sample)
             if image:
                 images.append(image)
-                text.append(join_dialog(s[0], self.tokenizer.sep_token))
+                text.append(join_dialog(text_sample, self.tokenizer.sep_token))
         
         inputs = self.processor(
             text=text, images=images, return_tensors="pt", 
@@ -42,13 +43,60 @@ class ResponseGeneratorCollator():
     
     def __init__(
             self,
-            tokenizer
+            tokenizer,
+            use_image_as_generator_input
         ):
         self.tokenizer = tokenizer
+        self.use_image_as_generator_input = use_image_as_generator_input
+    
+    # TODO
+    def _batchify_text_and_image_to_text(
+            self,
+            samples
+        ):
+        contexts, responses, images = [], [], []
+        for sample in samples:
+            text_sample, image_sample = sample[0], sample[1]
+            context = join_dialog(text_sample[:-1], self.tokenizer.eos_token) + self.tokenizer.eos_token
+            response = text_sample[-1] + self.tokenizer.eos_token
+            if self.use_image_as_generator_input:
+                image = load_image_from_url(image_sample)
+            if not image:
+                image = create_dummy_image()
+            contexts.append(context)
+            responses.append(response)
+            images.append(image)
+        
+        inputs = self.tokenizer(
+            contexts, return_tensors="pt",
+            padding="max_length", truncation=True, max_length=512
+        )
+        labels = self.tokenizer(
+            responses, return_tensors="pt",
+            padding="max_length", truncation=True, max_length=512
+        )
+        to_tensor_fn = ToTensor()
+        patch_images = torch.stack([to_tensor_fn(image) for image in images])
 
-    def __call__(self, samples):
-        contexts = [join_dialog(s[:-1], self.tokenizer.eos_token) + self.tokenizer.eos_token for s in samples]
-        responses = [s[-1] + self.tokenizer.eos_token for s in samples]
+        return {
+            "input_ids": inputs.input_ids,
+            "attention_mask": inputs.attention_mask,
+            "patch_images": patch_images,
+            "decoder_input_ids": labels.input_ids,
+            # "labels": labels.input_ids
+        }
+
+    def _batchify_text_to_text(
+            self,
+            samples
+        ):
+        contexts, responses = [], []
+        for sample in samples:
+            text_sample = sample[0]
+            context = join_dialog(text_sample[:-1], self.tokenizer.eos_token) + self.tokenizer.eos_token
+            response = text_sample[-1] + self.tokenizer.eos_token
+            contexts.append(context)
+            responses.append(response)
     
         input_ids, labels = [], []
         for context, response in zip(contexts, responses):
@@ -69,4 +117,9 @@ class ResponseGeneratorCollator():
             "attention_mask": attention_mask,
             "labels": labels
         }
-      
+
+    def __call__(self, samples):
+        if self.use_image_as_generator_input:
+            return self._batchify_text_and_image_to_text(samples)
+        else:
+            return self._batchify_text_to_text(samples)

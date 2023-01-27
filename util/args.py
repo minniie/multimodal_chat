@@ -30,6 +30,12 @@ class ModelArguments:
             "help": "generator model name for response generator"
         }
     )
+    use_image_as_generator_input: bool = field(
+        default=False,
+        metadata={
+            "help": "whether to use image as input to response generator"
+        }
+    )
 
 
 @dataclass

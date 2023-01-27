@@ -17,3 +17,9 @@ def load_image_from_url(url):
     warnings.simplefilter("default")
 
     return image
+
+
+def create_dummy_image():
+    image = Image.new('RGB', (IMAGE_DIM, IMAGE_DIM))
+    
+    return image
