@@ -11,7 +11,6 @@ python3 run_image_retriever.py \
     --per_device_eval_batch_size 16 \
     --evaluation_strategy steps \
     --eval_steps 100 \
-    --save_strategy steps \
-    --save_steps 500 \
+    --save_strategy epoch \
     --seed 1234 \
     --report_to tensorboard

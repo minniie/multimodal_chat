@@ -10,7 +10,6 @@ python3 run_response_generator.py \
     --per_device_eval_batch_size 16 \
     --evaluation_strategy steps \
     --eval_steps 1 \
-    --save_strategy steps \
-    --save_steps 500 \
+    --save_strategy epoch \
     --seed 1234 \
     --report_to tensorboard

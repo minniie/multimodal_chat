@@ -35,13 +35,18 @@ class ImageRetriever():
         self.text_model_name_or_path = text_model_name_or_path
         self.image_model_name_or_path = image_model_name_or_path
         self.multimodal_model_name_or_path = multimodal_model_name_or_path
+        self.load_tokenizer()
         self.load_processor()
         self.load_model()
+
+    def load_tokenizer(
+            self
+        ):
+        self.tokenizer = BertTokenizer.from_pretrained(self.text_model_name_or_path)
 
     def load_processor(
             self
         ):
-        self.tokenizer = BertTokenizer.from_pretrained(self.text_model_name_or_path)
         self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.image_model_name_or_path)
         self.processor = VisionTextDualEncoderProcessor(self.feature_extractor, self.tokenizer)
 

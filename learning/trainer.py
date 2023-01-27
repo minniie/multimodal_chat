@@ -6,6 +6,7 @@ import numpy as np
 from transformers import Trainer
 
 from util.metric import Perplexity, BLEU, DistinctN
+from learning.callback import MetricCallback
 
 
 class ImageRetrieverTrainer():
@@ -54,8 +55,19 @@ class ResponseGeneratorTrainer():
             training_args,
             response_generator,
             dataset,
-            collator
+            collator,
+            use_image_as_generator_input
         ):
+        # set trainer args
+        if use_image_as_generator_input:
+            preprocess_logits_for_metrics = None
+            compute_metrics = None
+            callbacks = [MetricCallback]
+        else:
+            preprocess_logits_for_metrics = self.preprocess_logits_for_metrics
+            compute_metrics = self.compute_metrics
+            callbacks = None
+
         self.trainer = Trainer(
             args=training_args,
             model=response_generator.model,
@@ -63,8 +75,9 @@ class ResponseGeneratorTrainer():
             train_dataset=dataset["train_set"],
             eval_dataset=dataset["dev_set"],
             data_collator=collator,
-            preprocess_logits_for_metrics=self.preprocess_logits_for_metrics,
-            compute_metrics=self.compute_metrics
+            preprocess_logits_for_metrics=preprocess_logits_for_metrics,
+            compute_metrics=compute_metrics,
+            callbacks=callbacks
         )
         self.tokenizer = response_generator.tokenizer
 

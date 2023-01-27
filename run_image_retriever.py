@@ -15,7 +15,11 @@ def main():
 
     # load model
     print("... Loading model")
-    image_retriever = ImageRetriever(device, model_args.text_model_name, model_args.image_model_name)
+    image_retriever = ImageRetriever(
+        device,
+        model_args.text_model_name,
+        model_args.image_model_name
+    )
     
     # get device util
     print("... Device util after loading model")
@@ -26,7 +30,10 @@ def main():
     processor = PhotochatProcessor()
     processor.split(data_args.dataset_path)
     dataset = processor.data_for_image_retriever
-    collator = ImageRetrieverCollator(image_retriever.processor, image_retriever.tokenizer)
+    collator = ImageRetrieverCollator(
+        image_retriever.tokenizer,
+        image_retriever.processor
+    )
 
     # set trainer
     trainer = ImageRetrieverTrainer(

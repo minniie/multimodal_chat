@@ -15,7 +15,11 @@ def main():
 
     # load model
     print("... Loading model")
-    response_generator = ResponseGenerator(device, model_args.generator_model_name)
+    response_generator = ResponseGenerator(
+        device,
+        model_args.generator_model_name,
+        model_args.use_image_as_generator_input
+    )
 
     # get device util
     print(f"... Device util after loading model")
@@ -28,6 +32,7 @@ def main():
     dataset = processor.data_for_response_generator
     collator = ResponseGeneratorCollator(
         response_generator.tokenizer,
+        response_generator.processor,
         model_args.use_image_as_generator_input
     )
 
@@ -36,7 +41,8 @@ def main():
         training_args,
         response_generator,
         dataset,
-        collator
+        collator,
+        model_args.use_image_as_generator_input
     )
     trainer.run(task_args)
 
