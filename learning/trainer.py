@@ -6,10 +6,8 @@ import numpy as np
 from transformers import Trainer
 
 from util.metric import Perplexity, BLEU, DistinctN
+from util.text import normalize_decode_per_token
 from learning.callback import MetricCallback
-
-
-COMPARE_CHARS = re.compile('[A-Za-z0-9]+')
 
 
 class ImageRetrieverTrainer():
@@ -96,8 +94,8 @@ class ResponseGeneratorTrainer():
         else:
             raise ArgumentError(f"Task name should be training or evaluation: {task_args.task}")
 
+    @staticmethod
     def preprocess_logits_for_metrics(
-            self,
             logits,
             labels
         ):
@@ -105,17 +103,6 @@ class ResponseGeneratorTrainer():
         ppl = Perplexity(logits, labels)["ppl"]
 
         return ppl, preds.to("cpu"), labels.to("cpu")
-
-    def normalize_decode_per_token(
-            self,
-            batch
-        ):
-        text = self.tokenizer.batch_decode(np.expand_dims(batch, axis=-1), skip_special_tokens=True)
-        text = [t.lower().strip() for t in text]
-        text = list(filter(lambda t: bool(COMPARE_CHARS.match(t)), text))
-        text = ['NONE'] if not text else text
-
-        return text
 
     def compute_metrics(
             self,
@@ -127,8 +114,8 @@ class ResponseGeneratorTrainer():
         
         preds_text, labels_text = [], []
         for pred, label in zip(preds, labels):
-            preds_text.append(self.normalize_decode_per_token(pred))
-            labels_text.append([self.normalize_decode_per_token(label)])
+            preds_text.append(normalize_decode_per_token(pred, self.tokenizer))
+            labels_text.append([normalize_decode_per_token(label, self.tokenizer)])
         
         ppl = {"ppl": np.mean(ppl)}
         bleu = BLEU(preds_text, labels_text)

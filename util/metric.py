@@ -29,7 +29,7 @@ def BLEU(preds, labels):
 def DistinctN(preds):
     def bigram(pred):
         return [" ".join(pred[i:i+2]) for i in range(len(pred)-1)]
-    preds_unigram = preds_bigram
+    preds_unigram = preds
     preds_bigram = list(map(bigram, preds))
     distinct_1 = list(map(ld.ttr, preds_unigram))
     distinct_1 = sum(distinct_1)/len(distinct_1)
