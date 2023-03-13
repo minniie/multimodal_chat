@@ -9,6 +9,9 @@ from util.metric import Perplexity, BLEU, DistinctN
 from learning.callback import MetricCallback
 
 
+COMPARE_CHARS = re.compile('[A-Za-z0-9]+')
+
+
 class ImageRetrieverTrainer():
     
     def __init__(
@@ -73,7 +76,7 @@ class ResponseGeneratorTrainer():
             model=response_generator.model,
             tokenizer=response_generator.tokenizer,
             train_dataset=dataset["train_set"],
-            eval_dataset=dataset["dev_set"],
+            eval_dataset=dataset["dev_set"][:16],
             data_collator=collator,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics,
             compute_metrics=compute_metrics,
@@ -107,15 +110,12 @@ class ResponseGeneratorTrainer():
             self,
             batch
         ):
-        batch = batch[:batch.tolist().index(self.tokenizer.eos_token_id)] \
-            if self.tokenizer.eos_token_id in batch else batch
-        pred = self.tokenizer.batch_decode(np.expand_dims(batch, axis=-1), skip_special_tokens=True)
-        pred = [p.lower() for p in pred]
-        special_chars = re.compile('[@_!#$%^&*()<>?/\|}{~:.,]')
-        pred = list(filter(lambda token: token and not bool(special_chars.match(token)), pred))
-        pred = ['NONE'] if not pred else pred
+        text = self.tokenizer.batch_decode(np.expand_dims(batch, axis=-1), skip_special_tokens=True)
+        text = [t.lower().strip() for t in text]
+        text = list(filter(lambda t: bool(COMPARE_CHARS.match(t)), text))
+        text = ['NONE'] if not text else text
 
-        return pred
+        return text
 
     def compute_metrics(
             self,
@@ -132,6 +132,6 @@ class ResponseGeneratorTrainer():
         
         ppl = {"ppl": np.mean(ppl)}
         bleu = BLEU(preds_text, labels_text)
-        distinct_n = DistinctN(preds_text, labels_text)
+        distinct_n = DistinctN(preds_text)
         
         return {**ppl, **bleu, **distinct_n}

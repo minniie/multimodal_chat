@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from nltk.translate.bleu_score import corpus_bleu
+from lexical_diversity import lex_div as ld
 
 
 def Perplexity(logits, labels):
@@ -25,10 +26,15 @@ def BLEU(preds, labels):
     }
 
 
-def DistinctN(preds, labels):
-    # TODO
-    distinct_1 = 0.0
-    distinct_2 = 0.0
+def DistinctN(preds):
+    def bigram(pred):
+        return [" ".join(pred[i:i+2]) for i in range(len(pred)-1)]
+    preds_unigram = preds_bigram
+    preds_bigram = list(map(bigram, preds))
+    distinct_1 = list(map(ld.ttr, preds_unigram))
+    distinct_1 = sum(distinct_1)/len(distinct_1)
+    distinct_2 = list(map(ld.ttr, preds_bigram))
+    distinct_2 = sum(distinct_2)/len(distinct_2)
 
     return {
         "distinct-1": distinct_1,
