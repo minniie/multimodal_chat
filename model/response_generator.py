@@ -52,6 +52,7 @@ class ResponseGenerator():
     def load_processor(
             self
         ):
+        self.processor = None
         if self.use_image_as_generator_input:
             self.processor = self.processor_cls.from_pretrained(self.generator_model_name_or_path)
 
@@ -60,6 +61,7 @@ class ResponseGenerator():
         ):
         self.model = self.model_cls.from_pretrained(self.generator_model_name_or_path)
         self.model.to(self.device)
+        self.model.resize_token_embeddings(len(self.tokenizer))
     
     def inference(
             self,
