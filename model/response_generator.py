@@ -61,7 +61,8 @@ class ResponseGenerator():
         ):
         self.model = self.model_cls.from_pretrained(self.generator_model_name_or_path)
         self.model.to(self.device)
-        self.model.resize_token_embeddings(len(self.tokenizer))
+        if not self.use_image_as_generator_input:
+            self.model.resize_token_embeddings(len(self.tokenizer))
     
     def inference(
             self,

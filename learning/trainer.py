@@ -76,7 +76,7 @@ class ResponseGeneratorTrainer():
             model=response_generator.model,
             tokenizer=response_generator.tokenizer,
             train_dataset=dataset["train_set"],
-            eval_dataset=dataset["dev_set"][:16],
+            eval_dataset=dataset["dev_set"],
             data_collator=collator,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics,
             compute_metrics=compute_metrics,
