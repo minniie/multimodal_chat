@@ -14,22 +14,38 @@ class MetricCallback(TensorBoardCallback):
         loss = state.log_history[-1]["eval_loss"]
         ppl = math.exp(loss)
         
-        # calculate bleu
+        # get model and dataset
         model = kwargs["model"]
         tokenizer = kwargs["tokenizer"]
         eval_dataloader = kwargs["eval_dataloader"]
         preds_text, labels_text = [], []
+
         for batch in eval_dataloader:
-            for sample in zip(batch["input_ids"], batch["pixel_values"], batch["labels"]):
-                input_ids = sample[0][sample[0] > 0].unsqueeze(0).to(model.device)
-                pixel_values = sample[1].unsqueeze(0).to(model.device)
-                label = sample[2]
-                pred = model.generate(
-                    input_ids=input_ids, pixel_values=pixel_values,
-                    max_length=64, num_beams=1, do_sample=True
-                ).squeeze().to("cpu")
-                preds_text.append(batch_decode(pred, tokenizer))
-                labels_text.append([batch_decode(label, tokenizer)])
+            # generate with text and image inputs
+            if "pixel_values" in batch.keys():
+                for sample in zip(batch["input_ids"], batch["pixel_values"], batch["labels"]):
+                    # remove all elements of 0 (right padding)
+                    input_ids = sample[0][sample[0] > 0].unsqueeze(0).to(model.device)
+                    pixel_values = sample[1].unsqueeze(0).to(model.device)
+                    label = sample[2]
+                    pred = model.generate(
+                        input_ids=input_ids, pixel_values=pixel_values,
+                        max_new_tokens=64, num_beams=1, do_sample=True
+                    ).squeeze().to("cpu")
+                    preds_text.append(batch_decode(pred, tokenizer))
+                    labels_text.append([batch_decode(label, tokenizer)])
+        
+            # genenrate with text input only
+            else:
+                for sample in zip(batch["input_ids"], batch["labels"]):
+                    # remove all elements of <|endoftext|> (right padding) and -100 (left padding)
+                    input_mask = torch.logical_and(sample[0] != sample[1], sample[0] != tokenizer.pad_token_id)
+                    input_ids = sample[0][input_mask].unsqueeze(0).to(model.device)
+                    label = sample[1]
+                    pred = model.generate(input_ids=input_ids, max_new_tokens=64).squeeze().to("cpu")
+                    pred = pred[input_ids.size(-1):]
+                    preds_text.append(batch_decode(pred, tokenizer))
+                    labels_text.append([batch_decode(label, tokenizer)])
         
         # calculate bleu and distinct-n
         bleu = BLEU(preds_text, labels_text)

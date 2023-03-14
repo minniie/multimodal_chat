@@ -45,9 +45,9 @@ class ResponseGenerator():
         ):
         self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_model_name_or_path)
         if not self.tokenizer.sep_token:
-            self.tokenizer.sep_token = self.tokenizer.eos_token
+            self.tokenizer.sep_token = "\n"
         if not self.tokenizer.pad_token:
-            self.tokenizer.add_special_tokens({"pad_token": "<|pad|>"})
+            self.tokenizer.pad_token = self.tokenizer.eos_token
 
     def load_processor(
             self
@@ -61,8 +61,6 @@ class ResponseGenerator():
         ):
         self.model = self.model_cls.from_pretrained(self.generator_model_name_or_path)
         self.model.to(self.device)
-        if not self.use_image_as_generator_input:
-            self.model.resize_token_embeddings(len(self.tokenizer))
     
     def inference(
             self,
