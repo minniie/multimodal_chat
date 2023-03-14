@@ -58,8 +58,8 @@ class ResponseGeneratorCollator():
         contexts, responses, images = [], [], []
         for sample in samples:
             text_sample, image_sample = sample[0], sample[1]
-            context = join_dialog(text_sample[:-1], self.tokenizer.sep_token) + self.tokenizer.sep_token
-            response = text_sample[-1] + self.tokenizer.sep_token
+            context = join_dialog(text_sample[:-1], self.tokenizer.sep_token)
+            response = text_sample[-1]
             if self.use_image_as_generator_input:
                 image = load_image_from_url(image_sample)
             if not image:

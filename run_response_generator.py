@@ -41,8 +41,7 @@ def main():
         training_args,
         response_generator,
         dataset,
-        collator,
-        model_args.use_image_as_generator_input
+        collator
     )
     trainer.run(task_args)
 

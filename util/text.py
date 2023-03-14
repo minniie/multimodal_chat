@@ -1,6 +1,7 @@
 import re
 from typing import List
 
+import torch
 import numpy as np
 
 
@@ -29,7 +30,8 @@ def remove_empty_uttr(dialog: List[str]):
     return dialog
 
 
-def normalize_decode_per_token(batch: List[int], tokenizer):
+def batch_decode(batch: List[int], tokenizer):
+    batch = torch.where(batch < 0, tokenizer.pad_token_id, batch)
     text = tokenizer.batch_decode(np.expand_dims(batch, axis=-1), skip_special_tokens=True)
     text = [t.lower().strip() for t in text]
     text = list(filter(lambda t: bool(ALLOWED_CHARS.match(t)), text))
