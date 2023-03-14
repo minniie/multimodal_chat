@@ -100,6 +100,11 @@ class ImageRetriever():
             response,
             images
         ):
+
+        """
+        https://github.com/huggingface/transformers/blob/v4.26.1/src/transformers/models/vision_text_dual_encoder/modeling_vision_text_dual_encoder.py#L296
+        """
+        
         # get text embeddings
         context.append(response)
         text = join_dialog(context, self.tokenizer.sep_token)

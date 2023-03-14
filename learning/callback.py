@@ -31,7 +31,6 @@ class MetricCallback(TensorBoardCallback):
         distinct_n = DistinctN(preds_text)
 
         # report to tensorboard
-        print(bleu, distinct_n)
         self.tb_writer.add_scalar("eval/ppl", ppl, state.global_step)
         self.tb_writer.add_scalar("eval/bleu-1", bleu["bleu-1"], state.global_step)
         self.tb_writer.add_scalar("eval/bleu-2", bleu["bleu-2"], state.global_step)

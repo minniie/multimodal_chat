@@ -32,9 +32,9 @@ class ResponseGenerator():
     def set_cls(
             self
         ):
-        if "blip" in self.generator_model_name_or_path:
+        if "blip" in self.generator_model_name_or_path.lower():
             self.tokenizer_cls, self.model_cls = AutoTokenizer, BlipForQuestionAnswering
-        elif "gpt" in self.generator_model_name_or_path:
+        elif "gpt" in self.generator_model_name_or_path.lower():
             self.tokenizer_cls, self.model_cls = GPT2Tokenizer, GPT2LMHeadModel
         else:
             self.tokenizer_cls, self.model_cls = AutoTokenizer, AutoModel

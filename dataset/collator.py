@@ -100,16 +100,12 @@ class ResponseGeneratorCollator():
         for context, response in zip(contexts, responses):
             context_ids = self.tokenizer.encode(context)
             response_ids = self.tokenizer.encode(response)
-            input_ids.append(torch.LongTensor(
-                context_ids + response_ids
-            ))
-            labels.append(torch.LongTensor(
-                len(context_ids)*[-100] + response_ids
-            ))
+            input_ids.append(torch.LongTensor(context_ids + response_ids))
+            labels.append(torch.LongTensor(len(context_ids)*[-100] + response_ids))
         input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id)
         attention_mask = input_ids != self.tokenizer.pad_token_id
         labels = pad_sequence(labels, batch_first=True, padding_value=-100)
-        
+
         return {
             "input_ids": input_ids,
             "attention_mask": attention_mask,
