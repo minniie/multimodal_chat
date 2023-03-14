@@ -24,13 +24,12 @@ class MetricCallback(TensorBoardCallback):
             # generate with text and image inputs
             if "pixel_values" in batch.keys():
                 for sample in zip(batch["input_ids"], batch["pixel_values"], batch["labels"]):
-                    # remove all elements of 0 (right padding)
+                    # remove all elements of [PAD] (right padding)
                     input_ids = sample[0][sample[0] > 0].unsqueeze(0).to(model.device)
                     pixel_values = sample[1].unsqueeze(0).to(model.device)
                     label = sample[2]
                     pred = model.generate(
-                        input_ids=input_ids, pixel_values=pixel_values,
-                        max_new_tokens=64, num_beams=1, do_sample=True
+                        input_ids=input_ids, pixel_values=pixel_values, max_new_tokens=64
                     ).squeeze().to("cpu")
                     preds_text.append(batch_decode(pred, tokenizer))
                     labels_text.append([batch_decode(label, tokenizer)])
