@@ -92,7 +92,7 @@ class ResponseGeneratorCollator():
         for sample in samples:
             text_sample = sample[0]
             context = join_dialog(text_sample[:-1], self.tokenizer.sep_token) + self.tokenizer.sep_token
-            response = text_sample[-1] + self.tokenizer.eos_token
+            response = text_sample[-1] + self.tokenizer.sep_token
             contexts.append(context)
             responses.append(response)
     

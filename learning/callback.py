@@ -17,6 +17,7 @@ class MetricCallback(TensorBoardCallback):
         # get model and dataset
         model = kwargs["model"]
         tokenizer = kwargs["tokenizer"]
+        sep_token_id = tokenizer.encode(tokenizer.sep_token)[0]
         eval_dataloader = kwargs["eval_dataloader"]
         preds_text, labels_text = [], []
 
@@ -41,7 +42,9 @@ class MetricCallback(TensorBoardCallback):
                     input_mask = torch.logical_and(sample[0] != sample[1], sample[0] != tokenizer.pad_token_id)
                     input_ids = sample[0][input_mask].unsqueeze(0).to(model.device)
                     label = sample[1]
-                    pred = model.generate(input_ids=input_ids, max_new_tokens=64).squeeze().to("cpu")
+                    pred = model.generate(
+                        input_ids=input_ids, max_new_tokens=64, eos_token_id=sep_token_id
+                    ).squeeze().to("cpu")
                     pred = pred[input_ids.size(-1):]
                     preds_text.append(batch_decode(pred, tokenizer))
                     labels_text.append([batch_decode(label, tokenizer)])

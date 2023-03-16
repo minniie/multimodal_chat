@@ -49,7 +49,7 @@ if __name__ == "__main__":
     print(f"{'*'*10} Loading image retriever")
     image_retriever = ImageRetriever(
         device=device,
-        multimodal_model_name_or_path=image_retriever_config.model_path
+        image_text_model_name_or_path=image_retriever_config.model_path
     )
 
     # load images

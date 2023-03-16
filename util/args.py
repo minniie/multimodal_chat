@@ -12,16 +12,22 @@ class ModelArguments:
     """
     Arguments for which model will be trained or evaluated
     """
+    image_model_name: str = field(
+        default=None,
+        metadata={
+            "help": "image model name for image retriever"
+        }
+    )
     text_model_name: str = field(
         default=None,
         metadata={
             "help": "text model name for image retriever"
         }
     )
-    image_model_name: str = field(
+    image_text_model_name: str = field(
         default=None,
         metadata={
-            "help": "image model name for image retriever"
+            "help": "VisionTextDualEncoderModel name for image retriever"
         }
     )
     generator_model_name: str = field(
