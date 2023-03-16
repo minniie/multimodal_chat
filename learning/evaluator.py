@@ -1,3 +1,4 @@
+import torch
 from transformers import Trainer
 
 from learning.callback import ResponseGeneratorCallback
@@ -19,28 +20,57 @@ class ImageRetrieverEvaluator():
         self.image_retriever = image_retriever
         self.eval_dataset = dataset["dev_set"]
     
+    @staticmethod
+    def compute_recall(
+            gold_url,
+            image_urls,
+            ids
+        ):
+        recall = 0
+        for id in ids:
+            pred_url = image_urls[id]
+            if pred_url == gold_url:
+                recall = 1
+
+        return recall
+
     def run( 
             self,
         ):
-        
-        # load images: TODO
+        # load image urls
         print("... Loading images")
         images = self.image_retriever.load_images(
             device=self.device,
             dataset_path=self.data_args.dataset_path,
             encoding_path=self.data_args.encoding_path
         )
+        _, image_urls = images
+        
+        # compute recall-1,5,10 averaged over dev set
+        total_recall_1,  total_recall_5, total_recall_10 = [], [], []
         for sample in self.eval_dataset:
             text_sample, image_sample = sample[0], sample[1]
-            image = load_image_from_url(image_sample)
-            if not image:
-                continue
-            image_encoding = self.image_retriever.processor(
-                image=image, return_tensors="pt"
-            )
             probs_per_image = self.image_retriever.inference(
                 self.device, text_sample, images
             )
+            top_10 = torch.topk(probs_per_image, 10).indices
+            recall_1_ids = top_10[:1]
+            recall_5_ids = top_10[:5]
+            recall_10_ids = top_10[:10]
+            total_recall_1.append(self.compute_recall(image_sample, image_urls, recall_1_ids))
+            total_recall_5.append(self.compute_recall(image_sample, image_urls, recall_5_ids))
+            total_recall_10.append(self.compute_recall(image_sample, image_urls, recall_10_ids))
+        
+        recall_1 = sum(total_recall_1)/len(total_recall_1)
+        recall_5 = sum(total_recall_5)/len(total_recall_5)
+        recall_10 = sum(total_recall_10)/len(total_recall_10)
+
+        print(
+            f"... Metrics\n"
+            f"> eval/recall-1\n{recall_1}\n"
+            f"> eval/recall-5\n{recall_5}\n"
+            f"> eval/recall-10\n{recall_10}"
+        )
 
 
 class ResponseGeneratorEvaluator():

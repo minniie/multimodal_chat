@@ -30,7 +30,7 @@ class ResponseGeneratorCallback(TensorBoardCallback):
                     pixel_values = sample[1].unsqueeze(0).to(model.device)
                     label = sample[2]
                     pred = model.generate(
-                        input_ids=input_ids, pixel_values=pixel_values, max_new_tokens=64
+                        input_ids=input_ids, pixel_values=pixel_values, max_new_tokens=32
                     ).squeeze().to("cpu")
                     inputs_text.append(tokenizer.batch_decode(input_ids))
                     preds_text.append(clean_decode(pred, tokenizer))
@@ -44,14 +44,14 @@ class ResponseGeneratorCallback(TensorBoardCallback):
                     input_ids = sample[0][input_mask].unsqueeze(0).to(model.device)
                     label = sample[1]
                     pred = model.generate(
-                        input_ids=input_ids, max_new_tokens=64#, eos_token_id=sep_token_id
+                        input_ids=input_ids, max_new_tokens=32, eos_token_id=tokenizer.eos_token_id
                     ).squeeze().to("cpu")
                     pred = pred[input_ids.size(-1):]
                     inputs_text.append(tokenizer.batch_decode(input_ids))
                     preds_text.append(clean_decode(pred, tokenizer))
                     labels_text.append([clean_decode(label, tokenizer)])
         
-        # calculate bleu and distinct-n
+        # compute bleu and distinct-n
         bleu = BLEU(preds_text, labels_text)
         distinct_n = DistinctN(preds_text)
 
@@ -66,7 +66,7 @@ class ResponseGeneratorCallback(TensorBoardCallback):
         # if evaluation mode, print metricså
         if args.do_eval:
             print(
-                f"... metrics\n"
+                f"... Metrics\n"
                 f"> eval/ppl\n{ppl}\n"
                 f"> eval/bleu-1\n{bleu['bleu-1']}\n"
                 f"> eval/bleu-2\n{bleu['bleu-2']}\n"
@@ -78,7 +78,7 @@ class ResponseGeneratorCallback(TensorBoardCallback):
         indices = random.sample(range(len(preds_text)), 5)
         for idx in indices:
             print(
-                f"... sample response\n"
+                f"... Sample response\n"
                 f"> dialogue history\n{inputs_text[idx]}\n"
                 f"> pred response\n{preds_text[idx]}\n"
                 f"> gold response\n{labels_text[idx]}"
