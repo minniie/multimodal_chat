@@ -1,5 +1,6 @@
 import argparse
 
+import torch
 from flask import Flask, request, render_template
 
 from demo.config import (
@@ -28,8 +29,15 @@ def send():
     req_data = request.get_json(force=True)
     context = req_data["context"]
     context = truncate_dialog(context, max_context_len=12)
+    
+    # get response
     response = response_generator.inference(context)
-    image_url = image_retriever.inference(device, context, response, images)
+
+    # get top 1 image
+    probs_per_image = image_retriever.inference(device, context, images)
+    idx = torch.argmax(probs_per_image, dim=-1).item()
+    image_url = images[1][idx]
+    
     res_data = {"bot_response": response, "image_url": image_url}
     
     return res_data
@@ -56,8 +64,8 @@ if __name__ == "__main__":
     print(f"{'*'*10} Loading images")
     images = image_retriever.load_images(
         device=device,
-        raw_path=data_config.images_raw_path,
-        processed_path=data_config.images_processed_path
+        dataset_path=data_config.images_dataset_path,
+        encoding_path=data_config.images_encoding_path
     )
 
     # load response generator

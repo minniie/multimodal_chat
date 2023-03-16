@@ -43,10 +43,14 @@ class ResponseGeneratorCollator():
     
     def __init__(
             self,
+            user_token,
+            bot_token,
             tokenizer,
             processor,
             use_image_as_generator_input
         ):
+        self.user_token = user_token
+        self.bot_token = bot_token
         self.tokenizer = tokenizer
         self.processor = processor
         self.use_image_as_generator_input = use_image_as_generator_input
@@ -91,8 +95,15 @@ class ResponseGeneratorCollator():
         contexts, responses = [], []
         for sample in samples:
             text_sample = sample[0]
-            context = join_dialog(text_sample[:-1], self.tokenizer.sep_token) + self.tokenizer.sep_token
-            response = text_sample[-1] + self.tokenizer.sep_token
+            text_sample_prefixed = text_sample.copy()
+            for id in range(len(text_sample)):
+                if (len(text_sample) % 2 == 0 and id % 2 == 0) \
+                    or (len(text_sample) % 2 == 1 and id % 2 == 1):
+                    text_sample_prefixed[id] = self.user_token + text_sample[id]
+                else:
+                    text_sample_prefixed[id] = self.bot_token + text_sample[id]
+            context = self.tokenizer.bos_token + join_dialog(text_sample_prefixed[:-1], "") + self.bot_token
+            response = text_sample_prefixed[-1][len(self.bot_token):] + self.tokenizer.eos_token
             contexts.append(context)
             responses.append(response)
     
@@ -104,7 +115,7 @@ class ResponseGeneratorCollator():
             labels.append(torch.LongTensor(len(context_ids)*[-100] + response_ids))
         input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id)
         attention_mask = input_ids != self.tokenizer.pad_token_id
-        labels = pad_sequence(labels, batch_first=True, padding_value=-100)
+        labels = pad_sequence(labels, batch_first=True, padding_value=self.tokenizer.pad_token_id)
 
         return {
             "input_ids": input_ids,

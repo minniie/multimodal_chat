@@ -30,11 +30,12 @@ def remove_empty_uttr(dialog: List[str]):
     return dialog
 
 
-def batch_decode(batch: List[int], tokenizer):
+def clean_decode(batch: List[int], tokenizer):
     batch = torch.where(batch < 0, tokenizer.pad_token_id, batch)
     text = tokenizer.batch_decode(np.expand_dims(batch, axis=-1), skip_special_tokens=True)
     text = [t.lower().strip() for t in text]
-    text = list(filter(lambda t: bool(ALLOWED_CHARS.match(t)), text))
+    text =  list(filter(None, text))
+    # text = list(filter(lambda t: bool(ALLOWED_CHARS.match(t)), text))
     text = ['NONE'] if not text else text
 
     return text

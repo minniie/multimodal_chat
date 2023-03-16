@@ -66,18 +66,19 @@ class ImageRetriever():
     def load_images(
             self,
             device,
-            raw_path,
-            processed_path
+            dataset_path,
+            encoding_path
         ):
-        # load processed images
-        if os.path.exists(processed_path):
-            images = torch.load(processed_path)
+        # load image encodings
+        if os.path.exists(encoding_path):
+            images = torch.load(encoding_path)
         
-        # iterate through raw dataset and save processed image embeddings and urls
+        # iterate through raw dataset and save image encodings and urls
         else:
-            image_urls_unfiltered, image_urls, image_embeds = [], [], []
-            file_path_list = sorted(glob.glob(raw_path+"/*/**"))
+            image_urls_unfiltered, image_urls, image_encodings = [], [], []
+            file_path_list = sorted(glob.glob(dataset_path+"/dev/**"))
             for file_path in file_path_list:
+                print(f"> file path\n{file_path}")
                 with open(file_path) as f:
                     data = json.load(f)
                 image_urls_unfiltered.extend(d["photo_url"] for d in data)
@@ -87,9 +88,9 @@ class ImageRetriever():
                     image_urls.append(url)
                     pixel = self.processor(images=image, return_tensors="pt").pixel_values
                     feature = self.model.get_image_features(pixel.to(device))
-                    image_embeds.append(feature.detach().cpu())
-            images = [image_embeds, image_urls]
-            torch.save(images, processed_path)
+                    image_encodings.append(feature.detach().cpu())
+            images = [image_encodings, image_urls]
+            torch.save(images, encoding_path)
         
         return images
 
@@ -97,7 +98,6 @@ class ImageRetriever():
             self,
             device,
             context,
-            response,
             images
         ):
 
@@ -105,28 +105,23 @@ class ImageRetriever():
         https://github.com/huggingface/transformers/blob/v4.26.1/src/transformers/models/vision_text_dual_encoder/modeling_vision_text_dual_encoder.py#L296
         """
         
-        # get text embeddings
-        context.append(response)
+        # get text encodings
         text = join_dialog(context, self.tokenizer.sep_token)
         text_inputs = self.processor(text=text, return_tensors="pt", padding=True)
-        text_embeds = self.model.get_text_features(text_inputs.input_ids.to(device))
+        text_encodings = self.model.get_text_features(text_inputs.input_ids.to(device))
 
-        # get image embeddings
-        image_embeds, image_urls = images
-        image_embeds = torch.cat(image_embeds, dim=0).to(device)
+        # get image encodings
+        image_encodings, image_urls = images
+        image_encodings = torch.cat(image_encodings, dim=0).to(device)
 
-        # normalized embeddings
-        image_embeds = image_embeds / image_embeds.norm(dim=-1, keepdim=True)
-        text_embeds = text_embeds / text_embeds.norm(dim=-1, keepdim=True)
+        # normalized encodings
+        image_encodings = image_encodings / image_encodings.norm(dim=-1, keepdim=True)
+        text_encodings = text_encodings / text_encodings.norm(dim=-1, keepdim=True)
 
         # cosine similarity as logits
         logit_scale = nn.Parameter(torch.ones([]) * LOGIT_SCALE_INIT_VALUE).exp()
-        logits_per_text = torch.matmul(text_embeds, image_embeds.t()) * logit_scale
+        logits_per_text = torch.matmul(text_encodings, image_encodings.t()) * logit_scale
         logits_per_image = logits_per_text.T
-
-        # get top1 image
         probs_per_image = F.softmax(logits_per_image.squeeze(), dim=0)
-        idx = torch.argmax(probs_per_image, dim=-1).item()
-        image_url = image_urls[idx]
 
-        return image_url
+        return probs_per_image

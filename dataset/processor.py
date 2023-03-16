@@ -53,7 +53,7 @@ class PhotochatProcessor():
                 dialog_per_uttr = [dialog_alternate[:i+1] for i in range(len(dialog_alternate))]
                 dialog_per_uttr_with_image = [(u, datum["photo_url"]) if i >= share_photo_idx else (u, "") \
                     for i, u in enumerate(dialog_per_uttr)]
-                self.data_for_response_generator[curr_set].extend(dialog_per_uttr_with_image)
+                self.data_for_response_generator[curr_set].extend(dialog_per_uttr_with_image[1:])
         
         print(
             f"> image retriever\n"

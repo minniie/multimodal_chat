@@ -52,7 +52,13 @@ class DataArguments:
     dataset_path: str = field(
         default=None,
         metadata={
-            "help": "dataset path to train models"
+            "help": "path to dataset for training models"
+        }
+    )
+    encoding_path: str = field(
+        default=None,
+        metadata={
+            "help": "path to dataset preprocessed as encodings"
         }
     )
     max_seq_len: int = field(
@@ -65,22 +71,9 @@ class DataArguments:
     )
 
 
-@dataclass
-class TaskArguments:
-    """
-    Arguments for which task the script is used for
-    """
-    task: str = field(
-        default=None,
-        metadata={
-            "help": "training or evaluation"
-        }
-    )
-
-
 def set_args():
-    parser = HfArgumentParser((ModelArguments, DataArguments, TaskArguments, TrainingArguments))
-    model_args, data_args, task_args, training_args = parser.parse_args_into_dataclasses()
+    parser = HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
+    model_args, data_args,training_args = parser.parse_args_into_dataclasses()
     set_seed(training_args.seed)
 
-    return model_args, data_args, task_args, training_args
+    return model_args, data_args, training_args

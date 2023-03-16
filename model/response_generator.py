@@ -24,6 +24,8 @@ class ResponseGenerator():
         self.device = device
         self.generator_model_name_or_path = generator_model_name_or_path
         self.use_image_as_generator_input = use_image_as_generator_input
+        self.user_token = "<user>"
+        self.bot_token = "<bot>"
         self.set_cls()
         self.load_tokenizer()
         self.load_processor()
@@ -43,11 +45,19 @@ class ResponseGenerator():
     def load_tokenizer(
             self
         ):
-        self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_model_name_or_path)
-        if not self.tokenizer.sep_token:
-            self.tokenizer.sep_token = "\n"
-        if not self.tokenizer.pad_token:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
+        # self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_model_name_or_path)
+        self.tokenizer = self.tokenizer_cls.from_pretrained("gpt2-medium")
+        # if not self.tokenizer.sep_token:
+        #     self.tokenizer.sep_token = "\n"
+        # if not self.tokenizer.pad_token:
+        #     self.tokenizer.pad_token = self.tokenizer.eos_token
+        if "gpt" in self.generator_model_name_or_path.lower():
+            self.tokenizer.add_special_tokens({
+                "pad_token": "<pad>",
+                "bos_token": "<bos>",
+                "eos_token": "<eos>"
+            })
+            self.tokenizer.add_tokens([self.user_token, self.bot_token])
 
     def load_processor(
             self
@@ -61,6 +71,8 @@ class ResponseGenerator():
         ):
         self.model = self.model_cls.from_pretrained(self.generator_model_name_or_path)
         self.model.to(self.device)
+        if "gpt" in self.generator_model_name_or_path.lower():
+            self.model.resize_token_embeddings(len(self.tokenizer))
     
     def inference(
             self,

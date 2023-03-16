@@ -1,8 +1,6 @@
-from argparse import ArgumentError
-
 from transformers import Trainer
 
-from learning.callback import MetricCallback
+from learning.callback import ResponseGeneratorCallback
 
 
 class ImageRetrieverTrainer():
@@ -20,28 +18,22 @@ class ImageRetrieverTrainer():
             train_dataset=dataset["train_set"],
             eval_dataset=dataset["dev_set"],
             data_collator=collator,
-            preprocess_logits_for_metrics=self.preprocess_logits_for_metrics
+            # preprocess_logits_for_metrics=self.preprocess_logits_for_metrics
         )
         self.processor = image_retriever.processor
 
     def run(
             self,
-            task_args
         ):
-        if task_args.task == "training":
-            self.trainer.train()
-            self.trainer.save_model()
-        elif task_args.task == "evaluation":
-            self.trainer.evaluate()
-        else:
-            raise ArgumentError(f"Task name should be training or evaluation: {task_args.task}")
+        self.trainer.train()
+        self.trainer.save_model()
 
-    @staticmethod
-    def preprocess_logits_for_metrics(
-            logits,
-            labels
-        ):
-        return logits.to("cpu"), labels.to("cpu")
+    # @staticmethod
+    # def preprocess_logits_for_metrics(
+    #         logits,
+    #         labels
+    #     ):
+    #     return logits.to("cpu"), labels.to("cpu")
 
 
 class ResponseGeneratorTrainer():
@@ -60,18 +52,11 @@ class ResponseGeneratorTrainer():
             train_dataset=dataset["train_set"],
             eval_dataset=dataset["dev_set"],
             data_collator=collator,
-            callbacks=[MetricCallback]
+            callbacks=[ResponseGeneratorCallback]
         )
-        self.tokenizer = response_generator.tokenizer
 
     def run(
             self,
-            task_args
         ):
-        if task_args.task == "training":
-            self.trainer.train()
-            self.trainer.save_model()
-        elif task_args.task == "evaluation":
-            self.trainer.evaluate()
-        else:
-            raise ArgumentError(f"Task name should be training or evaluation: {task_args.task}")
+        self.trainer.train()
+        self.trainer.save_model()
