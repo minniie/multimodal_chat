@@ -45,33 +45,31 @@ class ResponseGenerator():
     def load_tokenizer(
             self
         ):
-        # self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_model_name_or_path)
-        self.tokenizer = self.tokenizer_cls.from_pretrained("gpt2-medium")
-        # if not self.tokenizer.sep_token:
-        #     self.tokenizer.sep_token = "\n"
-        # if not self.tokenizer.pad_token:
-        #     self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_model_name_or_path)
+        self.tokenizer.add_tokens([self.user_token, self.bot_token])
         if "gpt" in self.generator_model_name_or_path.lower():
-            self.tokenizer.add_special_tokens({
-                "pad_token": "<pad>",
-                "bos_token": "<bos>",
-                "eos_token": "<eos>"
-            })
-            self.tokenizer.add_tokens([self.user_token, self.bot_token])
-
+            special_tokens = {"pad_token": "<pad>", "bos_token": "<bos>", "eos_token": "<eos>"}
+            self.tokenizer.add_special_tokens(special_tokens)
+        
     def load_processor(
             self
         ):
         self.processor = None
-        if self.use_image_as_generator_input:
+        if "blip" in self.generator_model_name_or_path.lower():
             self.processor = self.processor_cls.from_pretrained(self.generator_model_name_or_path)
+            self.processor.tokenizer.add_tokens([self.user_token, self.bot_token])
+            
 
     def load_model(
             self
         ):
         self.model = self.model_cls.from_pretrained(self.generator_model_name_or_path)
         self.model.to(self.device)
-        if "gpt" in self.generator_model_name_or_path.lower():
+        if "blip" in self.generator_model_name_or_path.lower():
+            self.model.text_encoder.resize_token_embeddings(len(self.tokenizer))
+            self.model.text_decoder.resize_token_embeddings(len(self.tokenizer))
+            self.model.decoder_start_token_id = self.tokenizer.encode(self.bot_token)[1]
+        elif "gpt" in self.generator_model_name_or_path.lower():
             self.model.resize_token_embeddings(len(self.tokenizer))
     
     def inference(

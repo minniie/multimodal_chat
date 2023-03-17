@@ -18,22 +18,22 @@ class ImageRetrieverTrainer():
             train_dataset=dataset["train_set"],
             eval_dataset=dataset["dev_set"],
             data_collator=collator,
-            # preprocess_logits_for_metrics=self.preprocess_logits_for_metrics
+            preprocess_logits_for_metrics=self.preprocess_logits_for_metrics
         )
         self.processor = image_retriever.processor
+
+    @staticmethod
+    def preprocess_logits_for_metrics(
+            logits,
+            labels
+        ):
+        return logits.to("cpu"), labels.to("cpu")
 
     def run(
             self,
         ):
         self.trainer.train()
         self.trainer.save_model()
-
-    # @staticmethod
-    # def preprocess_logits_for_metrics(
-    #         logits,
-    #         labels
-    #     ):
-    #     return logits.to("cpu"), labels.to("cpu")
 
 
 class ResponseGeneratorTrainer():

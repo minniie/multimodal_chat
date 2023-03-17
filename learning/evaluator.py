@@ -82,6 +82,7 @@ class ResponseGeneratorEvaluator():
             dataset,
             collator
         ):
+        # use huggingface trainer as evaluation mode
         self.evaluator = Trainer(
             args=training_args,
             model=response_generator.model,
