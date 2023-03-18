@@ -18,8 +18,8 @@ def main():
     print("... Loading model")
     response_generator = ResponseGenerator(
         device,
-        model_args.generator_model_name,
-        model_args.use_image_as_generator_input
+        model_args.generator_image_encoder_path,
+        model_args.generator_text_decoder_path
     )
 
     # get device util
@@ -35,8 +35,7 @@ def main():
         response_generator.user_token,
         response_generator.bot_token,
         response_generator.tokenizer,
-        response_generator.processor,
-        model_args.use_image_as_generator_input
+        response_generator.processor
     )
 
     # set trainer or evaluator

@@ -27,14 +27,14 @@ class ImageRetriever():
     def __init__(
             self,
             device,
-            image_model_name_or_path: str = "google/vit-base-patch16-224",
-            text_model_name_or_path: str = "bert-base-uncased",
-            image_text_model_name_or_path: str = None
+            retriever_image_encoder_path: str = "google/vit-base-patch16-224",
+            retriever_text_encoder_path: str = "bert-base-uncased",
+            retriever_finetuned_path: str = None
         ):
         self.device = device
-        self.image_model_name_or_path = image_model_name_or_path
-        self.text_model_name_or_path = text_model_name_or_path
-        self.image_text_model_name_or_path = image_text_model_name_or_path
+        self.retriever_image_encoder_path = retriever_image_encoder_path
+        self.retriever_text_encoder_path = retriever_text_encoder_path
+        self.retriever_finetuned_path = retriever_finetuned_path
         self.load_tokenizer()
         self.load_processor()
         self.load_model()
@@ -42,24 +42,24 @@ class ImageRetriever():
     def load_tokenizer(
             self
         ):
-        self.tokenizer = BertTokenizer.from_pretrained(self.text_model_name_or_path)
+        self.tokenizer = BertTokenizer.from_pretrained(self.retriever_text_encoder_path)
 
     def load_processor(
             self
         ):
-        self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.image_model_name_or_path)
+        self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.retriever_image_encoder_path)
         self.processor = VisionTextDualEncoderProcessor(self.feature_extractor, self.tokenizer)
 
     def load_model(
             self
         ):
-        if self.image_text_model_name_or_path:
+        if self.retriever_finetuned_path:
             self.model = VisionTextDualEncoderModel.from_pretrained(
-                self.image_text_model_name_or_path
+                self.retriever_finetuned_path
             )
         else:
             self.model = VisionTextDualEncoderModel.from_vision_text_pretrained(
-                self.image_model_name_or_path, self.text_model_name_or_path
+                self.retriever_image_encoder_path, self.retriever_text_encoder_path
             )
         self.model.to(self.device)
 

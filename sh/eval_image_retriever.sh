@@ -1,16 +1,12 @@
-CUDA_VISIBLE_DEVICES=3 \
+CUDA_VISIBLE_DEVICES=0 \
 python3 run_image_retriever.py \
-    --task evaluation \
+    --do_eval \
     --dataset_path /mnt/16tb/minyoung/code/photochat/dataset/photochat \
-    --text_model_name bert-base-uncased \
-    --image_model_name google/vit-base-patch16-224 \
-    --output_dir /mnt/16tb/minyoung/checkpoints/photochat/bert_vit_dummy \
-    --num_train_epochs 10 \
-    --per_device_train_batch_size 16 \
-    --gradient_accumulation_steps 1 \
+    --encoding_path /mnt/16tb/minyoung/checkpoints/photochat/vit_base_bert_base/checkpoint-643/image_encodings.pt \
+    --retriever_image_encoder_path google/vit-base-patch16-224 \
+    --retriever_text_encoder_path bert-base-uncased \
+    --retriever_finetuned_path /mnt/16tb/minyoung/checkpoints/photochat/vit_base_bert_base/checkpoint-643 \
+    --output_dir /mnt/16tb/minyoung/checkpoints/photochat/dummy \
     --per_device_eval_batch_size 16 \
-    --evaluation_strategy steps \
-    --eval_steps 100 \
-    --save_strategy epoch \
     --seed 1234 \
     --report_to tensorboard

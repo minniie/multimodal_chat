@@ -12,34 +12,40 @@ class ModelArguments:
     """
     Arguments for which model will be trained or evaluated
     """
-    image_model_name: str = field(
+    retriever_image_encoder_path: str = field(
         default=None,
         metadata={
-            "help": "image model name for image retriever"
+            "help": "path for image encoder of image retriever"
         }
     )
-    text_model_name: str = field(
+    retriever_text_encoder_path: str = field(
         default=None,
         metadata={
-            "help": "text model name for image retriever"
+            "help": "path for text encoder of image retriever"
         }
     )
-    image_text_model_name: str = field(
+    retriever_finetuned_path: str = field(
         default=None,
         metadata={
-            "help": "VisionTextDualEncoderModel name for image retriever"
+            "help": "path for finetuned checkpoint of image retriever"
         }
     )
-    generator_model_name: str = field(
+    generator_image_encoder_path: str = field(
         default=None,
         metadata={
-            "help": "generator model name for response generator"
+            "help": "path for image encoder of response generator"
         }
     )
-    use_image_as_generator_input: bool = field(
+    generator_text_decoder_path: str = field(
+        default=None,
+        metadata={
+            "help": "path for text decoder of response generator"
+        }
+    )
+    use_image_encoder_in_generator: bool = field(
         default=False,
         metadata={
-            "help": "whether to use image as input to response generator"
+            "help": "whether to use image encoder in response generator"
         }
     )
 

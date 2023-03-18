@@ -18,9 +18,9 @@ def main():
     print("... Loading model")
     image_retriever = ImageRetriever(
         device,
-        model_args.image_model_name,
-        model_args.text_model_name,
-        model_args.image_text_model_name
+        model_args.retriever_image_encoder_path,
+        model_args.retriever_text_encoder_path,
+        model_args.retriever_finetuned_path
     )
     
     # get device util

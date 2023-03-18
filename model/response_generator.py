@@ -1,10 +1,8 @@
 from transformers import (
-    BlipForQuestionAnswering,
+    VisionEncoderDecoderModel,
+    ViTImageProcessor,
     GPT2LMHeadModel,
-    GPT2Tokenizer,
-    AutoModel,
-    AutoTokenizer,
-    AutoProcessor
+    GPT2Tokenizer
 ) 
 
 from util.text import join_dialog
@@ -18,12 +16,12 @@ class ResponseGenerator():
     def __init__(
             self,
             device,
-            generator_model_name_or_path: str = "gpt2",
-            use_image_as_generator_input: bool = False
+            generator_image_encoder_path: str = None,
+            generator_text_decoder_path: str = None
         ):
         self.device = device
-        self.generator_model_name_or_path = generator_model_name_or_path
-        self.use_image_as_generator_input = use_image_as_generator_input
+        self.generator_image_encoder_path = generator_image_encoder_path
+        self.generator_text_decoder_path = generator_text_decoder_path
         self.user_token = "<user>"
         self.bot_token = "<bot>"
         self.set_cls()
@@ -34,42 +32,46 @@ class ResponseGenerator():
     def set_cls(
             self
         ):
-        if "blip" in self.generator_model_name_or_path.lower():
-            self.tokenizer_cls, self.model_cls = AutoTokenizer, BlipForQuestionAnswering
-        elif "gpt" in self.generator_model_name_or_path.lower():
-            self.tokenizer_cls, self.model_cls = GPT2Tokenizer, GPT2LMHeadModel
+        self.tokenizer_cls = GPT2Tokenizer
+        self.processor_cls = ViTImageProcessor
+        if self.generator_image_encoder_path:
+            self.model_cls = VisionEncoderDecoderModel
         else:
-            self.tokenizer_cls, self.model_cls = AutoTokenizer, AutoModel
-        self.processor_cls = AutoProcessor
+            self.model_cls = GPT2LMHeadModel
     
     def load_tokenizer(
             self
         ):
-        self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_model_name_or_path)
+        self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_text_decoder_path)
+        special_tokens = {"pad_token": "<pad>", "bos_token": "<bos>", "eos_token": "<eos>"}
+        self.tokenizer.add_special_tokens(special_tokens)
         self.tokenizer.add_tokens([self.user_token, self.bot_token])
-        if "gpt" in self.generator_model_name_or_path.lower():
-            special_tokens = {"pad_token": "<pad>", "bos_token": "<bos>", "eos_token": "<eos>"}
-            self.tokenizer.add_special_tokens(special_tokens)
         
     def load_processor(
             self
         ):
-        self.processor = None
-        if "blip" in self.generator_model_name_or_path.lower():
-            self.processor = self.processor_cls.from_pretrained(self.generator_model_name_or_path)
-            self.processor.tokenizer.add_tokens([self.user_token, self.bot_token])
-            
+        if self.generator_image_encoder_path:
+            self.processor = self.processor_cls.from_pretrained(self.generator_image_encoder_path)
+        else:
+            self.processor = None
 
     def load_model(
             self
         ):
-        self.model = self.model_cls.from_pretrained(self.generator_model_name_or_path)
-        self.model.to(self.device)
-        if "blip" in self.generator_model_name_or_path.lower():
-            self.model.text_encoder.resize_token_embeddings(len(self.tokenizer))
-            self.model.text_decoder.resize_token_embeddings(len(self.tokenizer))
-            self.model.decoder_start_token_id = self.tokenizer.encode(self.bot_token)[1]
-        elif "gpt" in self.generator_model_name_or_path.lower():
+        if self.generator_image_encoder_path:
+            self.model = self.model_cls.from_encoder_decoder_pretrained(
+                self.generator_image_encoder_path, self.generator_text_decoder_path
+            )
+            self.model.to(self.device)
+            self.model.decoder.resize_token_embeddings(len(self.tokenizer))
+            self.model.config.decoder_start_token_id = self.tokenizer.bos_token_id
+            self.model.config.pad_token_id = self.tokenizer.pad_token_id
+            self.model.config.bos_token_id = self.tokenizer.bos_token_id
+            self.model.config.eos_token_id = self.tokenizer.eos_token_id
+            self.model.config.vocab_size = self.model.config.decoder.vocab_size
+        else:
+            self.model = self.model_cls.from_pretrained(self.generator_text_decoder_path)
+            self.model.to(self.device)
             self.model.resize_token_embeddings(len(self.tokenizer))
     
     def inference(

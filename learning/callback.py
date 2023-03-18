@@ -24,32 +24,42 @@ class ResponseGeneratorCallback(TensorBoardCallback):
         for batch in eval_dataloader:
             # generate with text and image inputs
             if "pixel_values" in batch.keys():
-                for sample in zip(batch["input_ids"], batch["pixel_values"], batch["labels"]):
-                    # remove all elements of [PAD] (right padding)
-                    input_ids = sample[0][sample[0] > 0].unsqueeze(0).to(model.device)
-                    pixel_values = sample[1].unsqueeze(0).to(model.device)
-                    label = sample[2]
+                for input_ids, pixel_values, labels in \
+                    zip(batch["decoder_input_ids"], batch["pixel_values"], batch["labels"]):
+                    
+                    # shift labels back to right
+                    labels = torch.cat((torch.tensor([-100]), labels[:-1]), dim=-1)
+
+                    # parse input_ids by masking out labels and padding
+                    input_mask = torch.logical_and(input_ids != labels, input_ids != tokenizer.pad_token_id)
+                    input_ids = input_ids[input_mask].unsqueeze(0).to(model.device)
+                    
+                    # generate and decode prediction
+                    pixel_values = pixel_values.unsqueeze(0).to(model.device)
                     pred = model.generate(
-                        input_ids=input_ids, pixel_values=pixel_values, max_new_tokens=32
+                        decoder_input_ids=input_ids, pixel_values=pixel_values,
+                        max_new_tokens=32, eos_token_id=tokenizer.eos_token_id
                     ).squeeze().to("cpu")
+                    pred = pred[input_ids.size(-1):]
                     inputs_text.append(tokenizer.batch_decode(input_ids))
                     preds_text.append(clean_decode(pred, tokenizer))
-                    labels_text.append([clean_decode(label, tokenizer)])
+                    labels_text.append([clean_decode(labels, tokenizer)])
         
-            # genenrate with text input only
+            # generate with text input only
             else:
-                for sample in zip(batch["input_ids"], batch["labels"]):
-                    # remove all elements of <|endoftext|> (right padding) and -100 (left padding)
-                    input_mask = torch.logical_and(sample[0] != sample[1], sample[0] != tokenizer.pad_token_id)
-                    input_ids = sample[0][input_mask].unsqueeze(0).to(model.device)
-                    label = sample[1]
+                for input_ids, labels in zip(batch["input_ids"], batch["labels"]):
+                    # parse input_ids by masking out labels and padding 
+                    input_mask = torch.logical_and(input_ids != labels, input_ids != tokenizer.pad_token_id)
+                    input_ids = input_ids[input_mask].unsqueeze(0).to(model.device)
+                    
+                    # generate and decode prediction
                     pred = model.generate(
                         input_ids=input_ids, max_new_tokens=32, eos_token_id=tokenizer.eos_token_id
                     ).squeeze().to("cpu")
                     pred = pred[input_ids.size(-1):]
                     inputs_text.append(tokenizer.batch_decode(input_ids))
                     preds_text.append(clean_decode(pred, tokenizer))
-                    labels_text.append([clean_decode(label, tokenizer)])
+                    labels_text.append([clean_decode(labels, tokenizer)])
         
         # compute bleu and distinct-n
         bleu = BLEU(preds_text, labels_text)
@@ -75,7 +85,7 @@ class ResponseGeneratorCallback(TensorBoardCallback):
             )
 
         # print sample responses
-        indices = random.sample(range(len(preds_text)), 5)
+        indices = random.sample(range(len(preds_text)), 10)
         for idx in indices:
             print(
                 f"... Sample response\n"

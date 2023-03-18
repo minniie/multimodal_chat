@@ -57,7 +57,7 @@ if __name__ == "__main__":
     print(f"{'*'*10} Loading image retriever")
     image_retriever = ImageRetriever(
         device=device,
-        image_text_model_name_or_path=image_retriever_config.model_path
+        retriever_finetuned_path=image_retriever_config.model_path
     )
 
     # load images
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     print(f"{'*'*10} Loading response generator")
     response_generator = ResponseGenerator(
         device=device,
-        generator_model_name_or_path=response_generator_config.model_path
+        generator_text_decoder_path=response_generator_config.model_path
     )
 
     # get device util
