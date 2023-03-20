@@ -16,14 +16,23 @@ class ImageRetrieverCollator():
         self.processor = processor
 
     def __call__(self, samples):
-        images, texts = [], []
+        texts, images = [], []
         for sample in samples:
             text_sample, image_sample = sample[0], sample[1]
             image = load_image_from_url(image_sample)
             if image:
-                images.append(image)
                 texts.append(join_dialog(text_sample, self.tokenizer.sep_token))
+                images.append(image)
 
+        # edge case: when all images in batch are invalid, create dummy image
+        if len(images) == 0:
+            print("... all images in batch are invalid. using dummy image")
+            text_sample = samples[-1][0]
+            image = create_dummy_image()
+            texts.append(join_dialog(text_sample, self.tokenizer.sep_token))
+            images.append(image)
+
+        # automatically add [CLS] at beginning and [SEP] at end of tokenized text
         inputs = self.processor(
             text=texts, images=images, return_tensors="pt", 
             padding="max_length", truncation=True, max_length=512

@@ -2,8 +2,6 @@ import torch
 from transformers import Trainer
 
 from learning.callback import ResponseGeneratorCallback
-from util.image import load_image_from_url
-from util.text import join_dialog
 
 
 class ImageRetrieverEvaluator():
