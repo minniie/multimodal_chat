@@ -43,18 +43,25 @@ class PhotochatProcessor():
                         share_photo_idx = len(dialog_alternate)-1
                 dialog_alternate = [d["message"] for d in dialog_alternate]
                 dialog_alternate = clean_uttr(dialog_alternate)
-                
-                # data for image retriever
-                dialog_trunc = remove_empty_uttr(dialog_alternate[:share_photo_idx+1])
-                self.data_for_image_retriever[curr_set].append((dialog_trunc, datum["photo_url"]))
-
-                # data for response generator
+ 
+                # parse dialog of n uttrs into n-1 pairs of (dialogue history, response) 
                 dialog_alternate = remove_empty_uttr(dialog_alternate)
                 dialog_per_uttr = [dialog_alternate[:i+1] for i in range(len(dialog_alternate))]
-                dialog_per_uttr_with_image = [(u, datum["photo_url"]) if i >= share_photo_idx else (u, "") \
+
+                # data for image retriever
+                if "test" in file_path:
+                    dialog_per_uttr_with_image_unique = [(u, datum["photo_url"]) if i == share_photo_idx else (u, "") \
+                        for i, u in enumerate(dialog_per_uttr)]
+                    self.data_for_image_retriever[curr_set].extend(dialog_per_uttr_with_image_unique[1:])
+                else:
+                    dialog_trunc = remove_empty_uttr(dialog_alternate[:share_photo_idx+1])
+                    self.data_for_image_retriever[curr_set].append((dialog_trunc, datum["photo_url"]))
+
+                # data for response generator
+                dialog_per_uttr_with_image_cum = [(u, datum["photo_url"]) if i >= share_photo_idx else (u, "") \
                     for i, u in enumerate(dialog_per_uttr)]
-                self.data_for_response_generator[curr_set].extend(dialog_per_uttr_with_image[1:])
-        
+                self.data_for_response_generator[curr_set].extend(dialog_per_uttr_with_image_cum[1:])
+
         print(
             f"> image retriever\n"
             f"> train set\n{len(self.data_for_image_retriever['train_set'])}\n"

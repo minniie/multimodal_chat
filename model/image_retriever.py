@@ -76,7 +76,7 @@ class ImageRetriever():
         # iterate through raw dataset and save image encodings and urls
         else:
             image_urls_unfiltered, image_urls, image_encodings = [], [], []
-            file_path_list = sorted(glob.glob(dataset_path+"/dev/**"))
+            file_path_list = sorted(glob.glob(dataset_path+"/test/**"))
             for file_path in file_path_list:
                 print(f"> file path\n{file_path}")
                 with open(file_path) as f:
