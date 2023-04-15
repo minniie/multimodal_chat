@@ -19,7 +19,8 @@ def main():
     response_generator = ResponseGenerator(
         device,
         model_args.generator_image_encoder_path,
-        model_args.generator_text_decoder_path
+        model_args.generator_text_decoder_path,
+        model_args.generator_finetuned_path
     )
 
     # get device util

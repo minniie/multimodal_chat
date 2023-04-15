@@ -6,6 +6,7 @@ from transformers.integrations import TensorBoardCallback
 
 from util.metric import BLEU, DistinctN
 from util.text import clean_decode
+from util.image import save_image
   
 
 class ResponseGeneratorCallback(TensorBoardCallback):
@@ -44,6 +45,13 @@ class ResponseGeneratorCallback(TensorBoardCallback):
                     inputs_text.append(tokenizer.batch_decode(input_ids))
                     preds_text.append(clean_decode(pred, tokenizer))
                     labels_text.append([clean_decode(labels, tokenizer)])
+                    idx = -1
+                    print(
+                        f"... Sample response\n"
+                        f"> dialogue history\n{inputs_text[idx]}\n"
+                        f"> pred response\n{preds_text[idx]}\n"
+                        f"> gold response\n{labels_text[idx]}"
+                    )      
         
             # generate with text input only
             else:
@@ -59,7 +67,7 @@ class ResponseGeneratorCallback(TensorBoardCallback):
                     pred = pred[input_ids.size(-1):]
                     inputs_text.append(tokenizer.batch_decode(input_ids))
                     preds_text.append(clean_decode(pred, tokenizer))
-                    labels_text.append([clean_decode(labels, tokenizer)])
+                    labels_text.append([clean_decode(labels, tokenizer)]) 
         
         # compute bleu and distinct-n
         bleu = BLEU(preds_text, labels_text)

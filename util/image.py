@@ -1,6 +1,7 @@
 import requests
 import warnings
 
+import numpy as np
 from PIL import Image
 
 
@@ -23,3 +24,12 @@ def create_dummy_image():
     image = Image.new('RGB', (IMAGE_DIM, IMAGE_DIM))
     
     return image
+
+
+def save_image(pixels):
+    print(pixels)
+    pixels = np.array(pixels)
+    pixels = np.transpose(pixels, (1,2,0))
+    print(pixels.shape)
+    new_image = Image.fromarray((pixels).astype(np.uint8))
+    new_image.save('new.png')

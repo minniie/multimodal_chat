@@ -67,7 +67,7 @@ class ImageRetrieverEvaluator():
         cls_true, cls_pred = [], [] 
         total_recall_1,  total_recall_5, total_recall_10 = [], [], []
         total_mrr = []
-        for sample in self.eval_dataset:
+        for i, sample in enumerate(self.eval_dataset):
             dialogue_history, gold_image_url = sample[0], sample[1]
             probs_per_image = self.image_retriever.inference(
                 self.device, dialogue_history, images
@@ -90,13 +90,22 @@ class ImageRetrieverEvaluator():
                 total_recall_1.append(self.compute_recall(gold_image_url, image_urls, top_10_image_ids[:1]))
                 total_recall_5.append(self.compute_recall(gold_image_url, image_urls, top_10_image_ids[:5]))
                 total_recall_10.append(self.compute_recall(gold_image_url, image_urls, top_10_image_ids[:10]))
-        
+                
             # compute mrr
             if gold_image_url != "":
                 sorted_image_ids = torch.topk(probs_per_image, probs_per_image.size(-1)).indices
                 mrr = self.compute_mrr(gold_image_url, image_urls, sorted_image_ids)
                 if mrr:
                     total_mrr.append(mrr)
+
+            # print example dialogue history and top 5 ranked images
+            if gold_image_url != "" and i % 50 == 0 and total_recall_5[-1] == 1:
+                print(
+                    f"... Examples\n"
+                    f"> dialogue history\n{dialogue_history}\n"
+                    f"> ground-truth image\n{gold_image_url}\n"
+                    f"> top 5 images\n{[image_urls[id] for id in top_10_image_ids[:5]]}"
+                )
       
         cls_f1 = f1_score(cls_true, cls_pred)
         cnt_true = Counter(cls_true)

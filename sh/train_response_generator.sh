@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=3 \
+CUDA_VISIBLE_DEVICES=4 \
 python3 run_response_generator.py \
     --do_train \
     --dataset_path /mnt/16tb/minyoung/code/photochat/dataset/photochat \

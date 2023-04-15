@@ -17,11 +17,13 @@ class ResponseGenerator():
             self,
             device,
             generator_image_encoder_path: str = None,
-            generator_text_decoder_path: str = None
+            generator_text_decoder_path: str = None,
+            generator_finetuned_path: str = None
         ):
         self.device = device
         self.generator_image_encoder_path = generator_image_encoder_path
         self.generator_text_decoder_path = generator_text_decoder_path
+        self.generator_finetuned_path = generator_finetuned_path
         self.user_token = "<user>"
         self.bot_token = "<bot>"
         self.set_cls()
@@ -42,10 +44,13 @@ class ResponseGenerator():
     def load_tokenizer(
             self
         ):
-        self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_text_decoder_path)
-        special_tokens = {"pad_token": "<pad>", "bos_token": "<bos>", "eos_token": "<eos>"}
-        self.tokenizer.add_special_tokens(special_tokens)
-        self.tokenizer.add_tokens([self.user_token, self.bot_token])
+        if self.generator_finetuned_path:
+            self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_finetuned_path)
+        else:
+            self.tokenizer = self.tokenizer_cls.from_pretrained(self.generator_text_decoder_path)
+            special_tokens = {"pad_token": "<pad>", "bos_token": "<bos>", "eos_token": "<eos>"}
+            self.tokenizer.add_special_tokens(special_tokens)
+            self.tokenizer.add_tokens([self.user_token, self.bot_token])
         
     def load_processor(
             self
@@ -58,21 +63,28 @@ class ResponseGenerator():
     def load_model(
             self
         ):
-        if self.generator_image_encoder_path:
-            self.model = self.model_cls.from_encoder_decoder_pretrained(
-                self.generator_image_encoder_path, self.generator_text_decoder_path
-            )
+        # loading finetuned checkpoint
+        if self.generator_finetuned_path:
+            self.model = self.model_cls.from_pretrained(self.generator_finetuned_path)
             self.model.to(self.device)
-            self.model.decoder.resize_token_embeddings(len(self.tokenizer))
-            self.model.config.decoder_start_token_id = self.tokenizer.bos_token_id
-            self.model.config.pad_token_id = self.tokenizer.pad_token_id
-            self.model.config.bos_token_id = self.tokenizer.bos_token_id
-            self.model.config.eos_token_id = self.tokenizer.eos_token_id
-            self.model.config.vocab_size = self.model.config.decoder.vocab_size
-        else:
-            self.model = self.model_cls.from_pretrained(self.generator_text_decoder_path)
-            self.model.to(self.device)
-            self.model.resize_token_embeddings(len(self.tokenizer))
+
+        # loading pretrained checkpoint from huggingface
+        else:        
+            if self.generator_image_encoder_path:
+                self.model = self.model_cls.from_encoder_decoder_pretrained(
+                    self.generator_image_encoder_path, self.generator_text_decoder_path
+                )
+                self.model.to(self.device)
+                self.model.decoder.resize_token_embeddings(len(self.tokenizer))
+                self.model.config.decoder_start_token_id = self.tokenizer.bos_token_id
+                self.model.config.pad_token_id = self.tokenizer.pad_token_id
+                self.model.config.bos_token_id = self.tokenizer.bos_token_id
+                self.model.config.eos_token_id = self.tokenizer.eos_token_id
+                self.model.config.vocab_size = self.model.config.decoder.vocab_size
+            else:
+                self.model = self.model_cls.from_pretrained(self.generator_text_decoder_path)
+                self.model.to(self.device)
+                self.model.resize_token_embeddings(len(self.tokenizer))
     
     def inference(
             self,

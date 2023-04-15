@@ -42,10 +42,10 @@ class ModelArguments:
             "help": "path for text decoder of response generator"
         }
     )
-    use_image_encoder_in_generator: bool = field(
-        default=False,
+    generator_finetuned_path: str = field(
+        default=None,
         metadata={
-            "help": "whether to use image encoder in response generator"
+            "help": "path for finetuned checkpoint of response generator"
         }
     )
 
