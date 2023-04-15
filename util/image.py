@@ -27,9 +27,7 @@ def create_dummy_image():
 
 
 def save_image(pixels):
-    print(pixels)
     pixels = np.array(pixels)
     pixels = np.transpose(pixels, (1,2,0))
-    print(pixels.shape)
     new_image = Image.fromarray((pixels).astype(np.uint8))
     new_image.save('new.png')

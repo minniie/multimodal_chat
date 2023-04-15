@@ -96,7 +96,6 @@ class ImageRetriever():
 
     def inference(
             self,
-            device,
             context,
             images
         ):
@@ -107,12 +106,15 @@ class ImageRetriever():
         
         # get text encodings
         text = join_dialog(context, self.tokenizer.sep_token)
-        text_inputs = self.processor(text=text, return_tensors="pt", padding=True)
-        text_encodings = self.model.get_text_features(text_inputs.input_ids.to(device))
+        text_inputs = self.processor(
+            text=text, return_tensors="pt", 
+            padding="max_length", truncation=True, max_length=512
+        )
+        text_encodings = self.model.get_text_features(text_inputs.input_ids.to(self.model.device))
 
         # get image encodings
         image_encodings, image_urls = images
-        image_encodings = torch.cat(image_encodings, dim=0).to(device)
+        image_encodings = torch.cat(image_encodings, dim=0).to(self.model.device)
 
         # normalized encodings
         image_encodings = image_encodings / image_encodings.norm(dim=-1, keepdim=True)

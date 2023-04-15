@@ -11,7 +11,6 @@ from demo.config import (
 )
 from model.image_retriever import ImageRetriever
 from model.response_generator import ResponseGenerator
-from dataset.processor import PhotochatProcessor
 from util.text import truncate_dialog
 from util.resource import set_device, get_device_util
 
@@ -29,16 +28,20 @@ def send():
     req_data = request.get_json(force=True)
     context = req_data["context"]
     context = truncate_dialog(context, max_context_len=12)
-    
-    # get response
-    response = response_generator.inference(context)
 
     # get top 1 image
-    probs_per_image = image_retriever.inference(device, context, images)
-    idx = torch.argmax(probs_per_image, dim=-1).item()
-    image_url = images[1][idx]
+    image_url = None
+    if image_retriever_config.use_model:
+        probs_per_image = image_retriever.inference(context, images)
+        val, idx = torch.topk(probs_per_image, 1)
+        print(f"top 1 probability: {val.item()}")
+        if val.item() > 0.2:
+            image_url = images[1][idx]
     
-    res_data = {"bot_response": response, "image_url": image_url}
+    # get response
+    response = response_generator.inference(context, image_url)
+    
+    res_data = {"image_url": image_url, "bot_response": response}
     
     return res_data
 
@@ -57,7 +60,9 @@ if __name__ == "__main__":
     print(f"{'*'*10} Loading image retriever")
     image_retriever = ImageRetriever(
         device=device,
-        retriever_finetuned_path=image_retriever_config.model_path
+        retriever_image_encoder_path=image_retriever_config.image_encoder_path,
+        retriever_text_encoder_path=image_retriever_config.text_encoder_path,
+        retriever_finetuned_path=image_retriever_config.finetuned_path
     )
 
     # load images
@@ -72,7 +77,9 @@ if __name__ == "__main__":
     print(f"{'*'*10} Loading response generator")
     response_generator = ResponseGenerator(
         device=device,
-        generator_text_decoder_path=response_generator_config.model_path
+        generator_image_encoder_path=response_generator_config.image_encoder_path,
+        generator_text_decoder_path=response_generator_config.text_decoder_path,
+        generator_finetuned_path=response_generator_config.finetuned_path
     )
 
     # get device util

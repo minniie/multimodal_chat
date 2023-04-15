@@ -35,7 +35,6 @@ def clean_decode(batch: List[int], tokenizer):
     text = tokenizer.batch_decode(np.expand_dims(batch, axis=-1), skip_special_tokens=True)
     text = [t.lower().strip() for t in text]
     text =  list(filter(None, text))
-    # text = list(filter(lambda t: bool(ALLOWED_CHARS.match(t)), text))
     text = ['NONE'] if not text else text
 
     return text

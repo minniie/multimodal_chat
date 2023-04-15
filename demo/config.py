@@ -8,12 +8,20 @@ class ServeConfig(object):
 
 @dataclass
 class ImageRetrieverConfig(object):
-    model_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/bert_vit/checkpoint-6400"
+    image_encoder_path: str = "google/vit-base-patch16-224"
+    text_encoder_path: str = "bert-base-uncased"
+    finetuned_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/image_retriever/vit_base_bert_base/checkpoint-6430"
+    use_model: bool = True
 
 
 @dataclass
 class ResponseGeneratorConfig(object):
-    model_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/dialogpt_large/checkpoint-12000"
+    image_encoder_path: str = "google/vit-large-patch32-384"
+    text_decoder_path: str = "microsoft/DialoGPT-medium"
+    finetuned_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/response_generator/vit_large_dialogpt_medium/checkpoint-11174"
+    # image_encoder_path: str = None
+    # text_decoder_path: str = "microsoft/DialoGPT-medium"
+    # finetuned_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/response_generator/dialogpt_medium/checkpoint-11000"
 
 
 @dataclass

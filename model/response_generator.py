@@ -5,6 +5,7 @@ from transformers import (
     GPT2Tokenizer
 ) 
 
+from util.image import load_image_from_url, create_dummy_image
 from util.text import join_dialog
 
 
@@ -88,13 +89,53 @@ class ResponseGenerator():
     
     def inference(
             self,
-            context
+            context,
+            image_url
         ):
-        inp_text = join_dialog(context, self.tokenizer.sep_token) + self.tokenizer.sep_token
-        inp = self.tokenizer.encode(inp_text, return_tensors="pt").to(self.model.device)
-        pred = self.model.generate(inp, max_length=64, num_beams=1, do_sample=True)
-        pred_text = self.tokenizer.decode(pred[0][:-1])
-        pred_text = pred_text.replace(inp_text, "")
+        input_text = context.copy()
+        for id in range(len(context)):
+            if (len(context) % 2 == 0 and id % 2 == 0) \
+                or (len(context) % 2 == 1 and id % 2 == 1):
+                input_text[id] = self.bot_token + context[id]
+            else:
+                input_text[id] = self.user_token + context[id]
+        input_text = self.tokenizer.bos_token + join_dialog(input_text, "") + self.bot_token
+       
+        # generate with text and image inputs
+        if self.generator_image_encoder_path:
+            input_ids = self.tokenizer.encode(input_text, return_tensors="pt")
+            if image_url:
+                image = load_image_from_url(image_url)
+            else:
+                image = create_dummy_image()
+            pixel_values = self.processor(
+                images=image, return_tensors="pt"
+            ).pixel_values
+
+            pred = self.model.generate(
+                decoder_input_ids=input_ids.to(self.model.device),
+                pixel_values=pixel_values.to(self.model.device),
+                max_new_tokens=32,
+                eos_token_id=self.tokenizer.eos_token_id,
+                num_beams=1,
+                top_p=10,
+                do_sample=True
+            ).squeeze().to("cpu")
+        
+        # generate with text input only
+        else:
+            input_ids = self.tokenizer.encode(input_text, return_tensors="pt")
+            pred = self.model.generate(
+                input_ids=input_ids.to(self.model.device),
+                max_new_tokens=32,
+                eos_token_id=self.tokenizer.eos_token_id,
+                num_beams=1,
+                top_p=10,
+                do_sample=True
+            ).squeeze().to("cpu")
+
+        pred = pred[input_ids.size(-1):]
+        pred_text = self.tokenizer.decode(pred)
         if not pred_text:
             pred_text = "[END OF DIALOGUE]"
 
