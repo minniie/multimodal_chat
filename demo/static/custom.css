@@ -51,3 +51,33 @@ label[for*="header"] {
     clear: both;
     margin-bottom: 14px;
 }
+
+.btn-outline-primary {
+    background-color: white !important;
+    border-color: #547cff !important;
+    color: #547cff !important;
+}
+
+.btn-outline-primary:active, .btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: #8ba6ff !important;
+    border-color: #8ba6ff !important;
+    box-shadow: none !important;
+    color: white !important;
+}
+
+details > summary {
+    color: #2a3e7d;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 0.5em;
+}
+
+.evaluations {
+    height: 400px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.eval_statement {
+    font-size: 15px;
+}

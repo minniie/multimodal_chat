@@ -11,7 +11,9 @@ from demo.config import (
 )
 from model.image_retriever import ImageRetriever
 from model.response_generator import ResponseGenerator
+from util.io import save_dialog
 from util.text import truncate_dialog
+from util.time import get_date
 from util.resource import set_device, get_device_util
 
 
@@ -21,6 +23,11 @@ app = Flask(__name__)
 @app.route("/", methods=["GET"])
 def run():
     return render_template("main.html")
+
+
+@app.route("/evaluation", methods=["GET"])
+def evaluation():
+    return render_template("evaluation.html")
 
 
 @app.route("/send", methods=["POST"])
@@ -41,8 +48,49 @@ def send():
     # get response
     response = response_generator.inference(context, image_url)
     
+    # return data
     res_data = {"image_url": image_url, "bot_response": response}
+    return res_data
+
+
+@app.route("/save", methods=["POST"])
+def save():
+    req_data = request.get_json(force=True)
+
+    # preprocess data
+    context = req_data["context"]
+    context, response = context[:-1], context[-1]
+    evaluations = req_data["evaluations"]
+    name = req_data["name"]
+    date = get_date()
+
+    # save annotated dialog
+    dialog = {
+        "context": context,
+        "response": response,
+        "evaluations": evaluations
+    }
+    workload = save_dialog(dialog, data_config.evaluation_path, name, date, "turns.json")
     
+    # return data
+    res_data = {"workload": workload}
+    return res_data
+
+
+@app.route("/done", methods=["POST"])
+def done():
+    req_data = request.get_json(force=True)
+
+    # preprocess data
+    context = req_data["context"]
+    username = req_data["username"]
+    date = get_date()
+
+    # save annotated dialog
+    dialog = split_context(context, DomainVar.DELIMITER)
+    workload = save_dialogs(dialog, data_config.eval_dir_path, username, date, DomainVar.DONE_PIPELINE_FILE_NAME)
+ 
+    res_data = {"workload": workload}
     return res_data
 
 

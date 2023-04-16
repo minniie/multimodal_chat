@@ -28,3 +28,4 @@ class ResponseGeneratorConfig(object):
 class DataConfig(object):
     images_dataset_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/photochat"
     images_encoding_path: str = "/mnt/16tb/minyoung/code/photochat/dataset/photochat/image_encodings.pt"
+    evaluation_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/evaluation"

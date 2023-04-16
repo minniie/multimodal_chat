@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Multimodal Chatbot</title>
+    <script src="//code.jquery.com/jquery-3.4.0.min.js"></script>
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="static/custom.css" type="text/css">
+</head>
+
+<body>
+<div class="container">
+    <h1 class="display-title">Multimodal Chatbot</h1>
+    <br>
+
+    <form>
+        <div class="row">
+            <!-- left window -->
+            <div class="col">
+                <div class="form-group">
+                    <label for="header">Crowdworker Name</label>
+                    <textarea class="form-control" id="name" placeholder="Type your name" rows="1"></textarea>
+                    <br>
+                    <label for="header" id="turn_workload">Turns: N/A</label>
+                    <label for="header" id="session_workload">Sessions: N/A</label>
+                    </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="dialog_history">
+                                <p class="bot_msg">Hi, how are you?</p>
+                            </div>
+                            <textarea class="form-control" id="user_query" placeholder="Type message and press enter" rows="1"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- right window -->
+	        <div class="col">
+                <div class="form-group">
+                    <label for="header">Evaluation</label>
+                    <br>
+                    <div class="evaluations">
+                        <button type="submit" id="save" class="btn btn-outline-primary btn-sm float-right mb-2">Save and Continue</button>
+                        <details open>
+                            <summary>Turn Evaluation</summary>
+                            <div class="eval_statement">
+                                <input type="checkbox" id="fluency">
+                                <label for="fluency">The response is fluent without syntactical errors.</label>
+                            </div>
+                            <div class="eval_statement">
+                                <input type="checkbox" id="coherence">
+                                <label for="coherence">The response is coherent to the context without contradiction to previous utterances.</label>
+                            </div>
+                            <div class="eval_statement">
+                                <input type="checkbox" id="image_accuracy">
+                                <label for="image_accuracy">The image is appropriate to the context.</label>
+                            </div>
+                        </details>
+                        <button type="submit" id="done" class="btn btn-outline-primary btn-sm float-right mb-2">Done</button>
+                        <details open>
+                            <summary>Session Evaluation</summary>
+                            <div class="eval_statement">
+                                <input type="checkbox" id="engagingness">
+                                <label for="engagingness">It is fun to talk to the chatbot.</label>
+                            </div>
+                            <div class="eval_statement">
+                                <input type="checkbox" id="humanness">
+                                <label for="humanness">The chatbot sounds like a human.</label>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+</body>
+
+</html>
+<script src="/static/script.js"></script>
