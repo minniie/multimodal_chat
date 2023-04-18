@@ -11,6 +11,7 @@ class ImageRetrieverConfig(object):
     image_encoder_path: str = "google/vit-base-patch16-224"
     text_encoder_path: str = "bert-base-uncased"
     finetuned_path: str = "/mnt/16tb/minyoung/checkpoints/photochat/image_retriever/vit_base_bert_base/checkpoint-6430"
+    threshold: float = 0.15
     use_model: bool = True
 
 

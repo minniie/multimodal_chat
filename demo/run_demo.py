@@ -42,7 +42,7 @@ def send():
         probs_per_image = image_retriever.inference(context, images)
         val, idx = torch.topk(probs_per_image, 1)
         print(f"top 1 probability: {val.item()}")
-        if val.item() > 0.15:
+        if val.item() > image_retriever_config.threshold:
             image_url = images[1][idx]
     
     # get response
