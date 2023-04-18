@@ -1,13 +1,13 @@
-.display-title {
+.title {
     color: 	#547cff;
     font-weight: bold;
     font-size: 40px;
     text-align: center;
-    margin: 1em 0em 0em 0em;
+    margin: 1em 0em 0.2em 0em;
 }
 
 label[for*="header"] {
-    color: #313950;
+    color: #1c3a9b;
     font-weight: bold;
     font-size: 18px;
     vertical-align: sub;
@@ -18,7 +18,7 @@ label[for*="header"] {
     border-style: solid;
     border-color: #e6ebf2;
     padding: 10px;
-    height: 500px;
+    height: 540px;
     overflow: hidden;
     overflow-y: auto;
 }
@@ -65,19 +65,51 @@ label[for*="header"] {
     color: white !important;
 }
 
-details > summary {
-    color: #2a3e7d;
+/* css for creating horizontal Likert scale */
+/* reference from https://codepen.io/mr-t77/pen/jRzmMZ */
+
+.statement {
+    font-size: 14px;
     font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 0.5em;
+    padding: 20px 0 0 0;
 }
 
-.evaluations {
-    height: 400px;
+.likert {
+    list-style: none;
     width: 100%;
-    overflow-y: auto;
+    margin: 0;
+    padding: 0 0 20px;
+    display: block;
+    border-bottom: 2px solid #efefef;
 }
 
-.eval_statement {
-    font-size: 15px;
+.likert:last-of-type, .likert:nth-of-type(3) {
+    border-bottom: 0;
+}
+
+.likert:before {
+    content: '';
+    position: relative;
+    top: 11px;
+    left: 9.5%;
+    display: block;
+    background-color: #efefef;
+    height: 4px;
+    width: 78%;
+}
+
+li {
+    display: inline-block;
+    width: 19%;
+    text-align: center;
+    vertical-align: top;
+    font-size: 12px;
+}
+
+li input[type=radio] {
+    display: block;
+    position: relative;
+    top: 0;
+    left: 50%;
+    margin-left: -6px;
 }

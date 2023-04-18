@@ -10,9 +10,10 @@
 
 <body>
 <div class="container">
-    <h1 class="display-title">Multimodal Chatbot</h1>
+    <div>
+        <h1 class="title">Multimodal Chatbot</h1>
+    </div>
     <br>
-
     <form>
         <div class="row">
             <!-- left window -->
@@ -38,38 +39,127 @@
             <!-- right window -->
 	        <div class="col">
                 <div class="form-group">
-                    <label for="header">Evaluation</label>
+                    <button type="submit" id="save" class="btn btn-outline-primary btn-sm float-right mb-2">Save and Continue</button>
+                    <label for="header">Turn Evaluation</label>
                     <br>
-                    <div class="evaluations">
-                        <button type="submit" id="save" class="btn btn-outline-primary btn-sm float-right mb-2">Save and Continue</button>
-                        <details open>
-                            <summary>Turn Evaluation</summary>
-                            <div class="eval_statement">
-                                <input type="checkbox" id="fluency">
-                                <label for="fluency">The response is fluent without syntactical errors.</label>
-                            </div>
-                            <div class="eval_statement">
-                                <input type="checkbox" id="coherence">
-                                <label for="coherence">The response is coherent to the context without contradiction to previous utterances.</label>
-                            </div>
-                            <div class="eval_statement">
-                                <input type="checkbox" id="image_accuracy">
-                                <label for="image_accuracy">The image is appropriate to the context.</label>
-                            </div>
-                        </details>
-                        <button type="submit" id="done" class="btn btn-outline-primary btn-sm float-right mb-2">Done</button>
-                        <details open>
-                            <summary>Session Evaluation</summary>
-                            <div class="eval_statement">
-                                <input type="checkbox" id="engagingness">
-                                <label for="engagingness">It is fun to talk to the chatbot.</label>
-                            </div>
-                            <div class="eval_statement">
-                                <input type="checkbox" id="humanness">
-                                <label for="humanness">The chatbot sounds like a human.</label>
-                            </div>
-                        </details>
-                    </div>
+                    <label class="statement">The response is fluent without syntactical errors.</label>
+                    <ul class='likert'>
+                        <li>
+                            <input type="radio" name="fluency" value="strong_disagree">
+                            <label>Strongly Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="fluency" value="disagree">
+                            <label>Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="fluency" value="strong_agree">
+                            <label>Neutral</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="fluency" value="Agree">
+                            <label>Agree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="fluency" value="strong_agree">
+                            <label>Strongly Agree</label>
+                        </li>
+                    </ul>
+                    <label class="statement">The response is coherent to the context without contradiction to previous utterances.</label>
+                    <ul class='likert'>
+                        <li>
+                            <input type="radio" name="coherence" value="strong_disagree">
+                            <label>Strongly Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="coherence" value="disagree">
+                            <label>Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="coherence" value="strong_agree">
+                            <label>Neutral</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="coherence" value="Agree">
+                            <label  >Agree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="coherence" value="strong_agree">
+                            <label>Strongly Agree</label>
+                        </li>
+                    </ul>
+                    <label class="statement">The response is consistent with the shared image.</label>
+                    <ul class='likert'>
+                        <li>
+                            <input type="radio" name="image_groundedness" value="strong_disagree">
+                            <label>Strongly Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="image_groundedness" value="disagree">
+                            <label>Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="image_groundedness" value="strong_agree">
+                            <label>Neutral</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="image_groundedness" value="Agree">
+                            <label>Agree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="image_groundedness" value="strong_agree">
+                            <label>Strongly Agree</label>
+                        </li>
+                    </ul>
+                    <button type="submit" id="done" class="btn btn-outline-primary btn-sm float-right mb-2">Done</button>
+                    <label for="header">Session Evaluation</label>
+                    <br>
+                    <label class="statement">It is fun to talk to the chatbot.</label>
+                    <ul class='likert'>
+                        <li>
+                            <input type="radio" name="engagingness" value="strong_disagree">
+                            <label>Strongly Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="engagingness" value="disagree">
+                            <label>Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="engagingness" value="strong_agree">
+                            <label>Neutral</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="engagingness" value="Agree">
+                            <label>Agree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="engagingness" value="strong_agree">
+                            <label>Strongly Agree</label>
+                        </li>
+                    </ul>
+                    <label class="statement">The chatbot sounds like a human.</label>
+                    <ul class='likert'>
+                        <li>
+                            <input type="radio" name="humanness" value="strong_disagree">
+                            <label>Strongly Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="humanness" value="disagree">
+                            <label>Disagree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="humanness" value="strong_agree">
+                            <label>Neutral</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="humanness" value="Agree">
+                            <label>Agree</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="humanness" value="strong_agree">
+                            <label>Strongly Agree</label>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

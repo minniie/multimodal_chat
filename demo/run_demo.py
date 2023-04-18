@@ -42,7 +42,7 @@ def send():
         probs_per_image = image_retriever.inference(context, images)
         val, idx = torch.topk(probs_per_image, 1)
         print(f"top 1 probability: {val.item()}")
-        if val.item() > 0.2:
+        if val.item() > 0.15:
             image_url = images[1][idx]
     
     # get response
@@ -87,7 +87,7 @@ def done():
     date = get_date()
 
     # save annotated dialog
-    dialog = split_context(context, DomainVar.DELIMITER)
+    dialog = context
     workload = save_dialogs(dialog, data_config.eval_dir_path, username, date, DomainVar.DONE_PIPELINE_FILE_NAME)
  
     res_data = {"workload": workload}
