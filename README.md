@@ -1,4 +1,5 @@
 # multimodal_chat
+
 Princeton senior thesis by Min Young Lee
 
 ### Install requirements
@@ -8,7 +9,7 @@ sh setup.sh
 
 ### Run demo
 ```
-CUDA_VISIBLE_DEVICES=${id} python -m demo.run_demo
+python -m demo.run_demo
 ```
 
 ### Train and evaluate image retriever
