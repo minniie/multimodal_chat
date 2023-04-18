@@ -68,7 +68,7 @@ label[for*="header"] {
 /* css for creating horizontal Likert scale */
 /* reference from https://codepen.io/mr-t77/pen/jRzmMZ */
 
-.statement {
+.evaluation {
     font-size: 14px;
     font-weight: bold;
     padding: 20px 0 0 0;

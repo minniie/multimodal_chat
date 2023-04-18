@@ -7,6 +7,7 @@ $('#user_query').keypress(function(e) {
         var user_query = $('#user_query').val().trim();
         if (user_query.length == 0) {
             alert('No message is typed.')
+            button.prop('disabled', false);
             return;
         }
         var dialog_history = document.querySelector(".dialog_history");
@@ -41,30 +42,19 @@ $('#user_query').keypress(function(e) {
 });
 
 
-// iterate through turn evaluations
-var get_turn_evaluations = function() {
+// iterate through evaluations
+var get_evaluations = function(turn_or_session) {
     var evaluations = [];
-    $('[class*="msg"]').each(function(){
-    //$("input[type='checkbox']").each(function(){
-        var ischecked = $(this).is(":checked");
-        evaluations.push({"metric": $(this).attr("id"), "statement": $(this).next("label").text(), "is_checked": ischecked});
+    $(`input[id*="${turn_or_session}"]`).each(function(){
+        if ($(this).is(":checked")) {
+            evaluations.push({"metric": $(this).attr("name"), "statement": $(this).attr("value")});
+        }
     });
     return evaluations;
 };
 
 
-// iterate through session evaluations
-var get_session_evaluations = function() {
-    var evaluations = [];
-    $("input[type='checkbox']").each(function(){
-        var ischecked = $(this).is(":checked");
-        evaluations.push({"metric": $(this).attr("id"), "statement": $(this).next("label").text(), "is_checked": ischecked});
-    });
-    return evaluations;
-};
-
-
-// save evaluation results
+// save turn evaluation results
 $('#save').click(function(e) {
     e.preventDefault();
     var button = $(this);
@@ -74,6 +64,7 @@ $('#save').click(function(e) {
     var name = $('#name').val().trim(); 
     if (name.length == 0) {
         alert('Type your name.')
+        button.prop('disabled', false);
 	    return;
     }
 
@@ -85,7 +76,7 @@ $('#save').click(function(e) {
     }
     
     // get evaluations
-    var evaluations = get_evaluations();
+    var evaluations = get_evaluations("turn");
 
     // call endpoint
     $.ajax({
@@ -100,7 +91,7 @@ $('#save').click(function(e) {
         contentType: 'application/json',
         success: function(response) {
             $('#result_div').removeClass('d-none');
-            $('input[type=checkbox]').prop('checked', false);
+            $('input[type=radio]').prop('checked', false);
             $('#turn_workload').text('Turns: '+response.workload);
             button.prop('disabled', false);
         }
@@ -108,7 +99,7 @@ $('#save').click(function(e) {
 });
 
 
-// finish dialog
+// save session evaluation results
 $('#done').click(function(e) {
     e.preventDefault();
     var button = $(this);
@@ -118,6 +109,7 @@ $('#done').click(function(e) {
     var name = $('#name').val().trim(); 
     if (name.length == 0) {
         alert('Type your name.')
+        button.prop('disabled', false);
 	    return;
     }
 
@@ -129,7 +121,7 @@ $('#done').click(function(e) {
     }
 
     // get evaluations
-    var evaluations = get_evaluations();
+    var evaluations = get_evaluations("session");
 
     // call endpoint
     $.ajax({
@@ -144,7 +136,7 @@ $('#done').click(function(e) {
         contentType: 'application/json',
         success: function(response) {
             $('#result_div').removeClass('d-none');
-            $('input[type=checkbox]').prop('checked', false);
+            $('input[type=radio]').prop('checked', false);
             $('#session_workload').text('Sessions: '+response.workload);
             var dialog_history = document.querySelector(".dialog_history");
             dialog_history.innerHTML = `<p class="bot_msg">Hi, how are you?</p>`;

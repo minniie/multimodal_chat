@@ -83,13 +83,19 @@ def done():
 
     # preprocess data
     context = req_data["context"]
-    username = req_data["username"]
+    context, response = context[:-1], context[-1]
+    evaluations = req_data["evaluations"]
+    name = req_data["name"]
     date = get_date()
 
     # save annotated dialog
-    dialog = context
-    workload = save_dialogs(dialog, data_config.eval_dir_path, username, date, DomainVar.DONE_PIPELINE_FILE_NAME)
- 
+    dialog = {
+        "context": context,
+        "response": response,
+        "evaluations": evaluations
+    }
+    workload = save_dialog(dialog, data_config.evaluation_path, name, date, "sessions.json")
+    
     res_data = {"workload": workload}
     return res_data
 
