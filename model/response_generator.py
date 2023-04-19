@@ -130,7 +130,7 @@ class ResponseGenerator():
                 max_new_tokens=32,
                 eos_token_id=self.tokenizer.eos_token_id,
                 num_beams=1,
-                top_p=10,
+                top_p=0.1,
                 do_sample=True
             ).squeeze().to("cpu")
 
