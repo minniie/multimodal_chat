@@ -1,6 +1,6 @@
 # multimodal_chat
 
-Princeton senior thesis by Min Young Lee
+Princeton Senior Thesis by Min Young Lee
 
 ### Install requirements
 ```
