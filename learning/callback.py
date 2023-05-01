@@ -81,7 +81,7 @@ class ResponseGeneratorCallback(TensorBoardCallback):
             self.tb_writer.add_scalar("eval/distinct-1", distinct_n["distinct-1"], state.global_step)
             self.tb_writer.add_scalar("eval/distinct-2", distinct_n["distinct-2"], state.global_step)
         
-        # if evaluation mode, print metricså
+        # if evaluation mode, print metrics
         if args.do_eval:
             print(
                 f"... Metrics\n"
